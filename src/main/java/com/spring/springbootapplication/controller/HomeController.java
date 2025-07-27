@@ -1,4 +1,4 @@
-package com.spring.springbootapplication.controller;
+//package com.spring.springbootapplication.controller;
 
 //import org.springframework.web.bind.annotation.GetMapping;
 //import org.springframework.web.bind.annotation.RestController;
