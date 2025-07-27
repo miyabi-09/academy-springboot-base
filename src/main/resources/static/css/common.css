@@ -129,3 +129,15 @@ label {
     color: #FFFFFF;
     background-color: #1B5678;
 }
+
+/* 無効化 */
+.submit-btn:link,
+.submit-btn:visited {
+    text-decoration: none;  
+    color: #FFFFFF;  
+}
+
+.text-danger {
+    margin-top: 5px;
+    color: red;  
+}
