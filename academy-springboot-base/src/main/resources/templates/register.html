@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="ポートフォリオです">
+        <title>ログインページ</title>
+        <link rel="stylesheet" href="/css/common.css">
+        <!--<link rel="stylesheet" href="common.css">-->
+        <link rel="stylesheet" href="/css/register.css">
+        <!--<link rel="stylesheet" href="register.css">-->
+    </head>
+
+    <body>
+        <div class="wrapper">
+
+            <header class="header">
+                <div class="header-logo">My Portfolio</div>
+                <div class="header-button">ログイン</div>
+            </header>
+
+            <div class="main-content">
+                <form action="/register" method="post" th:object="${userForm}">
+    
+                    <h1 class="main-title">新規登録</h1>
+                    <div class="form-container">
+                        <div class="form-group">
+                            <label for="username">氏名</label>
+                            <input type="text" class="form-control" th:field="*{name}" id="username" placeholder="名前を入力してください"/>
+                            <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">メールアドレス</label>
+                            <input type="text" class="form-control" th:field="*{email}" id="email" placeholder="メールアドレスを入力してください"/>
+                            <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">パスワード</label>
+                            <input type="password" class="form-control" th:field="*{password}" id="password" placeholder="パスワードを入力してください"/>
+                            <div class="text-danger" th:if="${#fields.hasErrors('password')}" 
+                                th:text="${#fields.errors('password')[0]}"></div>
+                        </div>
+                        <div class="button-wrapper">
+                            <button type="submit" class="submit-btn">登録する</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <footer>
+                <div class="footer">portfolio site</div>
+            </footer>
+        </div>
+    </body>
+
+
+
+
+</html>

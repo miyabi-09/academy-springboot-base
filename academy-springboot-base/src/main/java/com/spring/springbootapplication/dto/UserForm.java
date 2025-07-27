@@ -23,7 +23,7 @@ public class UserForm {
     private String password;
 
 
-    // ----- getter・setter -----
+    // --- getter・setter ---
     public String getName() {
         return name;
     }
