@@ -21,6 +21,7 @@ label {
 .wrapper{
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
 }
 
 
@@ -69,7 +70,8 @@ label {
 .main-content{
     display: flex;
     justify-content: center;
-    margin-bottom: 319px;
+    margin: 0 auto;
+    flex: 1;
 }
 
 .form-container{
