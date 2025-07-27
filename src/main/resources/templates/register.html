@@ -37,10 +37,8 @@
                         <div class="form-group">
                             <label for="password">パスワード</label>
                             <input type="password" class="form-control" th:field="*{password}" id="password" placeholder="パスワードを入力してください"/>
-                            <div class="text-danger"
-                            th:each="err, iter : ${#fields.errors('password')}"
-                            th:if="${#fields.hasErrors('password')} and ${iter.index == 0}"
-                            th:text="${err.contains('必須') ? 'パスワードは必ず入力してください' : err}"></div>
+                            <div class="text-danger" th:if="${#fields.hasErrors('password')}" 
+                                th:text="${#fields.errors('password')[0]}"></div>
                         </div>
                         <div class="button-wrapper">
                             <button type="submit" class="submit-btn">登録する</button>
