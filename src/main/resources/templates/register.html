@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="ポートフォリオです">
-        <title>ログインページ</title>
+        <title>新規登録ページ</title>
         <link rel="stylesheet" href="/css/common.css">
         <!--<link rel="stylesheet" href="common.css">-->
         <link rel="stylesheet" href="/css/register.css">
@@ -16,7 +16,9 @@
 
             <header class="header">
                 <div class="header-logo">My Portfolio</div>
-                <div class="header-button">ログイン</div>
+                <form action="/logout" method="post" style="display:inline;">
+                    <button type="submit" class="header-button">ログイン</button>
+                </form>
             </header>
 
             <div class="main-content">

@@ -51,6 +51,7 @@ label {
     width: 152px;
     height: 53px;
     font-size: 18px;
+    border: none;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -78,13 +79,11 @@ label {
     flex: 1;
 }
 
-
 .form-container {
     width: 480px;
     margin: 0 auto;
     margin-top: 80px;
 }
-
 
 
 .form-container{
@@ -149,7 +148,7 @@ label {
 }
 
 /* 無効化 */
-.submit-btn:link,
+.submit-btn:link,   
 .submit-btn:visited {
     text-decoration: none;  
     color: #FFFFFF;  
