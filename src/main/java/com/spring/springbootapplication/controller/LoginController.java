@@ -42,16 +42,39 @@ public class LoginController {
             RedirectAttributes redirectAttributes,
             HttpSession session
     ) {
-        User user = userService.login(form.getEmail(), form.getPassword());
 
-        if (user != null) {
-            session.setAttribute("loginUser", user);  // セッションに保存
-            return "redirect:/top";                   // トップページに遷移
-        } else {
-            // エラー情報をFlash Attributeに入れてリダイレクト
-            redirectAttributes.addFlashAttribute("errorMessage", "メールアドレス、もしくはパスワードが間違っています");
-            redirectAttributes.addFlashAttribute("userForm", form); // 入力情報を戻す
-            return "redirect:/login";
-        }
+// ▼ ここからログ出力
+    System.out.println("=== ログイン処理開始 ===");
+    System.out.println("入力されたメールアドレス: " + form.getEmail());
+    System.out.println("入力されたパスワード: " + form.getPassword());
+    
+    User user = userService.login(form.getEmail(), form.getPassword());
+
+    if (user != null) {
+        System.out.println("ログイン成功: ユーザー名 = " + user.getName());
+        session.setAttribute("loginUser", user);
+        return "redirect:/top";
+    } else {
+        System.out.println("ログイン失敗: 該当するユーザーが見つかりません");
+        redirectAttributes.addFlashAttribute("errorMessage", "メールアドレス、もしくはパスワードが間違っています");
+        redirectAttributes.addFlashAttribute("userForm", form);
+        return "redirect:/login";
     }
+}
+
+
+
+
+        //User user = userService.login(form.getEmail(), form.getPassword());
+
+       //if (user != null) {
+        //    session.setAttribute("loginUser", user);  // セッションに保存
+         //   return "redirect:/top";                   // トップページに遷移
+        //} else {
+        //    // エラー情報をFlash Attributeに入れてリダイレクト
+        //    redirectAttributes.addFlashAttribute("errorMessage", "メールアドレス、もしくはパスワードが間違っています");
+        //    redirectAttributes.addFlashAttribute("userForm", form); // 入力情報を戻す
+        //    return "redirect:/login";
+        //}
+    //}
 }
