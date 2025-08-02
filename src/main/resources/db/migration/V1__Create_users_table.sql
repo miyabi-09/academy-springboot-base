@@ -6,5 +6,5 @@ CREATE TABLE users (
     introduction TEXT,
     avatar_path VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
-)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
