@@ -51,7 +51,7 @@ public class User {
     private LocalDateTime updatedAt; // 更新日時
 
 
-    // ---- getter・setter ----
+    // --- getter・setter ---
     public Long getId() {
         return id;
     }
