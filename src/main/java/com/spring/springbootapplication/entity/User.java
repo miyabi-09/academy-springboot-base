@@ -42,17 +42,10 @@ public class User {
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$", message = "英数字8文字以上で入力してください")
     private String password; // パスワード
 
-    //@Column(nullable = false)
-    //@Size(min = 50, max = 200, message = "自己紹介は50文字以上、200文字以下で入力してください")
-    //private String introduction; // 自己紹介文
-
-    //@Column(name = "avatar_path")
-    //private String avatarPath; // アバター画像
-
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt; // 登録日時
-
+    
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false, updatable = false)
     private LocalDateTime updatedAt; // 更新日時
