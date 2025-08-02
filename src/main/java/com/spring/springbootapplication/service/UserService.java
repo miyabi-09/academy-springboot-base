@@ -16,10 +16,7 @@ public class UserService {
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-
-    //public User login(String email, String password) {
-    //    return userRepository.findByEmailAndPassword(email, password);
-
+    
     public User login(String email, String password) {
     Optional<User> optionalUser = userRepository.findByEmail(email);
     if (optionalUser.isPresent()) {
