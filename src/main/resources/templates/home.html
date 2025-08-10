@@ -28,9 +28,9 @@
                     <!-- プロフィール写真 -->
                     <div class="profile-photo">
                         <div class="photo-placeholder">
-                            <img th:src="@{${image != null and image != '' ? image : '/images/default-profile.jpg'}}" alt="プロフィール画像" class="profile-img">
+                            <img th:src="${#strings.isEmpty(image)} ? @{/images/default_profile.png} : @{${image}}" alt="プロフィール画像" class="profile-img">
                         </div>
-                            <p class="user-name" th:text="${userName}"></p>
+                        <p class="user-name" th:text="${userName}"></p>
                     </div>
 
                     <!-- 自己紹介コンテンツ -->
@@ -42,7 +42,7 @@
                 </div>
 
                 <!-- 学習チャートセクション -->
-                <div class="profile-section">
+                <div class="study-section">
                     <div class="study-content">
                         <h1 class="study-title">学習チャート</h1>
                         <a href="/skills" class="submit-edit-btn">編集する</a> 
@@ -51,7 +51,9 @@
             </div>
 
             <footer>
-                <div class="footer">portfolio site</div>
+                <div class="footer">
+                    <span th:if="${userName != null}"><span th:text="${userName}"></span></span>
+                </div>
             </footer>
         </div>
     </body>
