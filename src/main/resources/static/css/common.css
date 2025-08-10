@@ -73,8 +73,6 @@ label {
 
 /* フォーム */
 .main-content{
-    display: flex;
-    justify-content: center;
     margin: 0 auto;
     flex: 1;
 }
