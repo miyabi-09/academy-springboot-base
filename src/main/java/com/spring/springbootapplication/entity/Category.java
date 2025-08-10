@@ -14,31 +14,17 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import jakarta.validation.constraints.Email;
 
 @Entity
-@Table(name = "users")
+@Table(name = "categories")
 @EntityListeners(AuditingEntityListener.class)
-public class User {
+public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // ユーザーID
+    private Integer id; // カテゴリーID
 
-    @NotBlank(message = "氏名は必ず入力してください")
-    @Size(max = 255, message = "氏名は255文字以内で入力してください")
-    @Column(nullable = false)
-    private String name; // 氏名
-
-    @NotBlank(message = "メールアドレスは必ず入力してください")
-    @Email(message = "メールアドレスが正しい形式ではありません")
-    @Column(nullable = false, unique = true, length = 255)
-    private String email; // メールアドレス
-
-    @NotBlank(message = "パスワードは必ず入力してください")
-    @Column(nullable = false, length = 100)
-    private String password; // パスワード
+    @Column(name = "name", nullable = false, updatable = false)
+    private String name; // カテゴリー名
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -50,10 +36,10 @@ public class User {
 
 
     // --- getter・setter ---
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -62,20 +48,6 @@ public class User {
     }
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -91,6 +63,4 @@ public class User {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-
-
 }
