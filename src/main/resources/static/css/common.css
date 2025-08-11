@@ -152,6 +152,11 @@ label {
     color: #FFFFFF;  
 }
 
+a
+{
+    text-decoration: none;  
+}
+
 .text-danger {
     margin-top: 5px;
     color: red;  
