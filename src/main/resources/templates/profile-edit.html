@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ログインページ</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/profile-edit.css">
+</head>
+<body>
+    <div class="wrapper">
+        <header class="header">
+            <div class="header-logo">My Portfolio</div>
+        </header>
+
+        <div class="main-content">
+            <form th:action="@{/login}" method="post">
+                <h1 class="main-title">自己紹介を編集する</h1>
+                <div class="form-container">
+                    <div class="form-group">
+                        <label for="bio">自己紹介文</label>
+                        <textarea id="bio" name="bio" rows="5" placeholder="自己紹介を入力してください">
+                        </textarea>
+                        <!-- ログイン失敗メッセージの表示 -->
+                        <div th:if="${param.error}" class="error-message">
+                            50文字以上、200文字以下で入力してください
+                        </div>
+                        <!-- 画像アップロード -->
+                        <label for="image">アバター画像</label>
+                        <input type="file" name="image" id="image" accept="image/*">
+                        <button type="submit">画像ファイルを添付する</button>
+                        <div class="button-wrapper">
+                            <button type="submit" class="submit-btn">自己紹介を確定する</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <footer>
+            <div class="footer">portfolio site</div>
+        </footer>
+    </div> 
+</body>
+</html>
