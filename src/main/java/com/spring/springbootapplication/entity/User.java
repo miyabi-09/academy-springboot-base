@@ -37,7 +37,7 @@ public class User {
     private String email; // メールアドレス
 
     @NotBlank(message = "パスワードは必ず入力してください")
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 255)
     private String password; // パスワード
 
     @CreatedDate
@@ -45,8 +45,15 @@ public class User {
     private LocalDateTime createdAt; // 登録日時
 
     @LastModifiedDate
-    @Column(name = "updated_at", nullable = false, updatable = false)
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt; // 更新日時
+
+    @Column(name = "introduction", columnDefinition = "TEXT")
+    private String introduction; // 自己紹介 // DB用（バリデーションなし）
+
+    @Column(name = "avatar_path", length = 255)
+    private String avatarPath; // プロフィール画像のファイルパス
+
 
 
     // --- getter・setter ---
@@ -92,5 +99,20 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
+    public String getIntroduction() {
+        return introduction;
+    }
+
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
+    }
+
+    public String getAvatarPath() {
+        return avatarPath;
+    }
+
+    public void setAvatarPath(String avatarPath) {
+        this.avatarPath = avatarPath;
+    }
 
 }

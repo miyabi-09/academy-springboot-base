@@ -1,44 +1,67 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>ログインページ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ポートフォリオです">
+    <title>自己紹介編集ページ</title>
     <link rel="stylesheet" href="/css/common.css">
     <link rel="stylesheet" href="/css/profile-edit.css">
 </head>
+
 <body>
     <div class="wrapper">
-        <header class="header">
-            <div class="header-logo">My Portfolio</div>
-        </header>
 
-        <div class="main-content">
-            <form th:action="@{/login}" method="post">
-                <h1 class="main-title">自己紹介を編集する</h1>
-                <div class="form-container">
-                    <div class="form-group">
-                        <label for="bio">自己紹介文</label>
-                        <textarea id="bio" name="bio" rows="5" placeholder="自己紹介を入力してください">
-                        </textarea>
-                        <!-- ログイン失敗メッセージの表示 -->
-                        <div th:if="${param.error}" class="error-message">
-                            50文字以上、200文字以下で入力してください
-                        </div>
+    <header class="header">
+        <div class="header-logo">My Portfolio</div>
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="header-button">ログアウト</button>
+            </form>
+    </header>
+
+    <div class="main-content">
+        <form th:action="@{/profile/edit}" method="post" enctype="multipart/form-data">
+            <!-- CSRF -->
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <h1 class="main-title">自己紹介を編集する</h1>
+
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="introduction">自己紹介文</label>
+                    <!-- ログイン失敗メッセージの表示 -->
+                    <!-- エラー時は flash(form.introduction)、通常は DB の user.introduction -->
+                    <textarea id="introduction" name="introduction" class="bio-textarea" rows="5" 
+                                th:text="${form?.introduction} ?: ${user?.introduction}"></textarea>
+                    <div class="text-danger" th:if="${introError}" th:text="${introError}"></div>
+                    
+                    <div class="file-wrapper">
                         <!-- 画像アップロード -->
                         <label for="image">アバター画像</label>
-                        <input type="file" name="image" id="image" accept="image/*">
-                        <button type="submit">画像ファイルを添付する</button>
-                        <div class="button-wrapper">
-                            <button type="submit" class="submit-btn">自己紹介を確定する</button>
+                        <input type="file" name="image" class="file-input sr-only" id="image" accept="image/*">
+                        <!-- これが見た目のボタンになる -->
+                        <div class="file-btn-wrapper">
+                        <label for="image" class="file-btn">画像ファイルを添付する</label>
+                        <span id="file-name" class="file-name" aria-live="polite"></span>
                         </div>
                     </div>
                 </div>
-            </form>
-        </div>
 
-        <footer>
-            <div class="footer">portfolio site</div>
-        </footer>
-    </div> 
+                <div class="button-wrapper">
+                    <button type="submit" class="submit-btn">自己紹介を確定する</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <footer>
+        <div class="footer">
+        <span th:if="${user != null}" th:text="${user.name}">ユーザー名</span>
+        </div>  
+    </footer>
+
+    </div>
+    <script defer src="/js/profile-edit.js"></script>
 </body>
 </html>

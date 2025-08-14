@@ -2,6 +2,7 @@ package com.spring.springbootapplication.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.springbootapplication.entity.User;
 import com.spring.springbootapplication.repository.UserRepository;
@@ -9,12 +10,12 @@ import com.spring.springbootapplication.repository.UserRepository;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // 正しいコンストラクタ
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -32,17 +33,33 @@ public class UserService {
         return null;
     }
 
-    public User save(User user) {
-        // パスワードをハッシュ化して保存
+    private String normalizeEmail(String email) {
+        return email == null ? null : email.trim().toLowerCase();
+    }
+
+    
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(normalizeEmail(email));
+        //String key = email == null ? "" : email.trim();
+        //return userRepository.existsByEmail(key);
+    }
+
+    public Optional<User> findUserByEmail(String email) {
+        return userRepository.findByEmail(normalizeEmail(email));
+        //return userRepository.findByEmail(email == null ? null : email.trim());
+    }
+
+    public User registerUser(User user) {
+        user.setEmail(normalizeEmail(user.getEmail()));
+        // パスワードをハッシュ化してから保存
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
-    public boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
+    @Transactional
+    public void saveProfile(User user) {
+        // パスワードの再エンコードなどは一切しないで保存
+        userRepository.save(user);
     }
 
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
 }

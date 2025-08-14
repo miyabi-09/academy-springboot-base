@@ -12,6 +12,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.spring.springbootapplication.service.MyUserDetailsService;
+
 import jakarta.servlet.DispatcherType;
 
 @Configuration
@@ -23,25 +25,35 @@ public class WebSecurityConfig {
     }
 
     // DaoAuthenticationProvider をBean化（使うUDSを明示）
+    //@Bean
+    //public DaoAuthenticationProvider daoAuthProvider(
+    //        @Qualifier("customUserDetailsService") UserDetailsService uds,
+    //        PasswordEncoder encoder) {
+    //    DaoAuthenticationProvider p = new DaoAuthenticationProvider();
+    //    p.setUserDetailsService(uds);
+    //    p.setPasswordEncoder(encoder);
+    //    return p;
+    //}
+
     @Bean
     public DaoAuthenticationProvider daoAuthProvider(
-            @Qualifier("customUserDetailsService") UserDetailsService uds,
-            PasswordEncoder encoder) {
-        DaoAuthenticationProvider p = new DaoAuthenticationProvider();
-        p.setUserDetailsService(uds);
-        p.setPasswordEncoder(encoder);
-        return p;
+        MyUserDetailsService uds,   // ★ 型で特定
+        PasswordEncoder encoder) {
+    var p = new DaoAuthenticationProvider();
+    p.setUserDetailsService(uds);
+    p.setPasswordEncoder(encoder);
+    return p;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, DaoAuthenticationProvider dao) throws Exception {http
-        .authenticationProvider(dao)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, DaoAuthenticationProvider dao) throws Exception {
+        http.authenticationProvider(dao)
 
             // 認証の設定: 記載したURLパターンを許可
             .authorizeHttpRequests(auth -> auth
             .dispatcherTypeMatchers(DispatcherType.ERROR, DispatcherType.FORWARD).permitAll()
-            .requestMatchers("/css/**","/js/**","/images/**","/error", "/error/**","/debug/**").permitAll() // ★ CHANGED
-            .requestMatchers("/login", "/register").permitAll()            // ★ CHANGED
+            .requestMatchers("/css/**","/js/**","/images/**","/uploads/**","/error","/error/**","/debug/**").permitAll()
+            .requestMatchers("/login", "/register").permitAll()
             .anyRequest().authenticated()  // それ以外は認証が必要
             )
 

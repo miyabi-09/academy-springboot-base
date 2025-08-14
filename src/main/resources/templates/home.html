@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,29 +14,28 @@
     <body>
         <div class="wrapper">
 
-            <header class="header">
+        <header class="header">
             <div class="header-logo">My Portfolio</div>
-                <!-- ログアウトボタン: POST メソッド -->
                 <form th:action="@{/logout}" method="post" style="display:inline;">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> <!-- ★ 追加 -->
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                     <button type="submit" class="header-button">ログアウト</button>
                 </form>
-            </header>
+        </header>
 
             <div class="main-content">
                 <div class="profile-section">
                     <!-- プロフィール写真 -->
                     <div class="profile-photo">
                         <div class="photo-placeholder">
-                            <img th:src="${#strings.isEmpty(image)} ? @{/images/default_profile.png} : @{${image}}" alt="プロフィール画像" class="profile-img">
+                            <img th:src="${#strings.isEmpty(user?.avatarPath)} ? @{/images/default_profile.png} : @{${user.avatarPath}}" alt="プロフィール画像" class="profile-img">
                         </div>
-                        <p class="user-name" th:text="${userName}"></p>
+                        <p class="user-name" th:text="${user?.name}"></p>
                     </div>
 
                     <!-- 自己紹介コンテンツ -->
                     <div class="profile-content">
                         <h1 class="profile-title">自己紹介</h1>
-                        <p class="profile-description" th:text="${bio}"></p>
+                        <p class="profile-text" th:text="${#strings.isEmpty(user?.introduction) ? '自己紹介がまだ未登録です' : user.introduction}"></p>
                         <a href="/profile/edit" class="submit-profile-btn">自己紹介を編集する</a> 
                     </div>
                 </div>
@@ -52,8 +51,8 @@
 
             <footer>
                 <div class="footer">
-                    <span th:if="${userName != null}"><span th:text="${userName}"></span></span>
-                </div>
+                    <span th:if="${user != null}" th:text="${user.name}">ユーザー名</span>
+                </div>  
             </footer>
         </div>
     </body>

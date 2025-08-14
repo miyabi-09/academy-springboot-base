@@ -1,1 +1,59 @@
 @import url('/css/common.css');
+
+.bio-textarea{
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    text-align: left; 
+    color: #000000DE;
+}
+
+.file-wrapper{
+    display: flex;
+    flex-direction: column;
+    margin-top: 48px;
+}
+
+.file-input{
+    position:absolute;
+    width:1px;
+    height:1px;
+    margin:-1px;
+    padding:0;
+    border:0;
+    clip:rect(0 0 0 0);
+    overflow:hidden;
+}
+
+.file-btn-wrapper{
+    display: flex;
+    align-items:center;
+}
+
+.file-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center; 
+    margin-top: 4px;
+    width: 202px;
+    height:32px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #000000BF;
+    background-color: #0000001A;
+    cursor: pointer;
+}
+
+.file-btn:hover{ 
+    background:#eaeaea; 
+}
+
+.file-name { 
+    margin-left: 8px; 
+    font-size: 0.8rem;
+    color: #555; 
+}
+
+.submit-btn{
+    width: 322px;
+}
