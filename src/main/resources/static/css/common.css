@@ -58,6 +58,7 @@ label {
     border-radius: 4px;
     color: #000000BF;
     background: #FFFFFF;
+    cursor: pointer;
 }
 
 
@@ -152,12 +153,15 @@ label {
     color: #FFFFFF;  
 }
 
-a
-{
-    text-decoration: none;  
+
+a{
+    text-decoration: none;
+    cursor: pointer;
+
 }
 
 .text-danger {
+    font-size: 12px;
     margin-top: 5px;
     color: red;  
 } 

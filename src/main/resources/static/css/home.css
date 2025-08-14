@@ -13,6 +13,7 @@ p {
 
 .profile-section{
     display: flex;
+    align-items: center;
     gap: 80px;
     width: 960px;
     margin: 0 auto;
@@ -48,10 +49,16 @@ p {
 
 /* プロフィールコンテンツ */
 .profile-title{
-    margin: 52px 0 32px 0;
+    /* margin: 52px 0 32px 0;*/
+    margin: 0 0 32px 0;
     font-size: 36px;
     font-weight: bold;
     color: #000000BF;
+}
+
+.profile-text{
+    overflow-wrap: anywhere;
+    hyphens: auto;
 }
 
 .profile-title::after {
@@ -70,10 +77,11 @@ p {
     text-align: center;
 }
 
-.profile-contents{
+.profile-content{
     width: 520px;
+    /*margin-top: 60px;*/
     text-align: left;
-    margin-top: 60px;
+    min-width: 0; /* ← flex子要素が内容幅で広がるのを抑止 */
 }
 
 
@@ -92,6 +100,11 @@ p {
     background: #1B5678;
 }
 
+.submit-profile-btn:hover {
+    background-color: #144564;
+    cursor: pointer;
+}
+
 
 
 /* 学習チャート */
@@ -99,6 +112,7 @@ p {
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-bottom: 30px;
 }
 
 .study-title{
@@ -131,4 +145,9 @@ p {
     border-radius: 4px;
     color: #FFFFFF;
     background: #1B5678;
+}
+
+.submit-edit-btn:hover {
+    background-color: #144564;
+    cursor: pointer;
 }

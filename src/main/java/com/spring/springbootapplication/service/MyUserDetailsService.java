@@ -19,10 +19,12 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        System.out.println("ログイン試行中: " + email); // デバッグ用ログ
+        String key = (email == null) ? null : email.trim().toLowerCase();
 
-        User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+        System.out.println("ログイン試行中: " + key); // デバッグ用ログ
+    
+        User user = userRepository.findByEmail(key)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + key));
 
         // DBにはBCrypt済みパスワードが保存されていることが前提
         return org.springframework.security.core.userdetails.User

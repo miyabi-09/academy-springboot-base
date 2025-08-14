@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,14 +13,14 @@
 
     <body>
         <div class="wrapper">
-
             <header class="header">
                 <div class="header-logo">My Portfolio</div>
                 <a href="/login" class="header-button">ログイン</a>
             </header>
 
             <div class="main-content">
-                <form action="/register" method="post" th:object="${userForm}">
+                <form th:action="@{/register}" method="post" th:object="${userForm}">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
     
                     <h1 class="main-title">新規登録</h1>
                     <div class="form-container">

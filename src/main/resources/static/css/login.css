@@ -11,6 +11,11 @@
     background-color: #1B5678;
 }
 
+.header-button {
+  cursor: inherit;
+}
+
+
 /* 送信ボタン */
 .submit-btn{
     display: flex;
