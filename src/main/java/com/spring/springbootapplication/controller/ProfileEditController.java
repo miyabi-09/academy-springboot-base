@@ -68,7 +68,7 @@ public class ProfileEditController {
         String v = introduction == null ? "" : introduction.trim();
         if (v.length() < 50 || v.length() > 200) {
             // フィールド専用のエラーを載せる（キー名は何でもOK）
-            ra.addFlashAttribute("introError", "50文字以上、200文字以下で入力してください");
+            ra.addFlashAttribute("introError", "自己紹介は50文字以上、200文字以下で入力してください");
             ra.addFlashAttribute("form", Map.of("introduction", v));
             return "redirect:/profile/edit";
         }
