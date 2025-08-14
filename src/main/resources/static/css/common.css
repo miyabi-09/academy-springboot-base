@@ -153,9 +153,11 @@ label {
     color: #FFFFFF;  
 }
 
+
 a{
     text-decoration: none;
-    cursor: pointer
+    cursor: pointer;
+
 }
 
 .text-danger {
