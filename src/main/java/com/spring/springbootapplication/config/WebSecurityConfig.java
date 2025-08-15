@@ -24,17 +24,6 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // DaoAuthenticationProvider をBean化（使うUDSを明示）
-    //@Bean
-    //public DaoAuthenticationProvider daoAuthProvider(
-    //        @Qualifier("customUserDetailsService") UserDetailsService uds,
-    //        PasswordEncoder encoder) {
-    //    DaoAuthenticationProvider p = new DaoAuthenticationProvider();
-    //    p.setUserDetailsService(uds);
-    //    p.setPasswordEncoder(encoder);
-    //    return p;
-    //}
-
     @Bean
     public DaoAuthenticationProvider daoAuthProvider(
         MyUserDetailsService uds,   // ★ 型で特定
