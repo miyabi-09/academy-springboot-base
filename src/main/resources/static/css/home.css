@@ -34,7 +34,7 @@ p {
 .profile-img {
     width: 360px; 
     height: 360px; 
-    object-fit:contain;
+    object-fit: fill; /* 比率を無視して全体を360×360に */
     /*object-fit: cover;  /* 枠内に画像収める */
     border-radius: 50%; 
 }
