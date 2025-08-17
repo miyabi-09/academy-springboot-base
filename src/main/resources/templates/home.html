@@ -27,7 +27,8 @@
                     <!-- プロフィール写真 -->
                     <div class="profile-photo">
                         <div class="photo-placeholder">
-                            <img th:src="${#strings.isEmpty(user?.avatarPath)} ? @{/images/default_profile.png} : @{${user.avatarPath}}" alt="プロフィール画像" class="profile-img">
+                            <img th:src="${user.avatarUrl} != null ? @{${user.avatarUrl}} : @{/images/default_profile.png}" alt="プロフィール画像" class="profile-img">
+                            <!--<img th:src="${#strings.isEmpty(user?.avatarPath)} ? @{/images/default_profile.png} : @{${user.avatarPath}}" alt="プロフィール画像" class="profile-img">-->
                         </div>
                         <p class="user-name" th:text="${user?.name}"></p>
                     </div>

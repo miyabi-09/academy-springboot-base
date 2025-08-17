@@ -85,6 +85,7 @@ public class ProfileEditController {
                 Path dest = dir.resolve(filename);
                 Files.copy(in, dest, StandardCopyOption.REPLACE_EXISTING);
                 user.setAvatarPath("/uploads/" + filename);
+                user.setAvatarPath(filename); 
             } catch (Exception e) {
                 System.err.println("画像保存に失敗: " + e.getMessage());
                 ra.addFlashAttribute("error", "画像の保存に失敗しました");
