@@ -13,6 +13,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Transient;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -107,12 +108,29 @@ public class User {
         this.introduction = introduction;
     }
 
-    public String getAvatarPath() {
-        return avatarPath;
+    //public String getAvatarPath() {
+    //    return avatarPath;
+    //}
+
+    //public void setAvatarPath(String avatarPath) {
+    //    this.avatarPath = avatarPath;
+    //}
+
+    @Transient
+    public String getAvatarUrl() {
+        if (this.avatarPath == null || this.avatarPath.isBlank()) return null;
+        return this.avatarPath.startsWith("/uploads/")
+                ? this.avatarPath
+                : "/uploads/" + this.avatarPath;
     }
 
     public void setAvatarPath(String avatarPath) {
+    // 先頭に /uploads/ が付いていたら剥がして DB には「ファイル名だけ」を保存
+    if (avatarPath != null && avatarPath.startsWith("/uploads/")) {
+        this.avatarPath = avatarPath.substring("/uploads/".length());
+    } else {
         this.avatarPath = avatarPath;
     }
+}
 
 }
