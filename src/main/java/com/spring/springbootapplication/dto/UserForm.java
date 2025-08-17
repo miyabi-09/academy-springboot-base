@@ -21,7 +21,7 @@ public class UserForm {
     message = "英数字8文字以上で入力してください")
     private String password;
 
-    @Size(min = 50, max = 1000, message = "自己紹介は50文字以上1000文字以内で入力してください")
+    @Size(min = 50, max = 200, message = "自己紹介は50文字以上200文字以内で入力してください")
     private String introduction; // フォーム用
 
 

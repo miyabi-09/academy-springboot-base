@@ -108,14 +108,6 @@ public class User {
         this.introduction = introduction;
     }
 
-    //public String getAvatarPath() {
-    //    return avatarPath;
-    //}
-
-    //public void setAvatarPath(String avatarPath) {
-    //    this.avatarPath = avatarPath;
-    //}
-
     @Transient
     public String getAvatarUrl() {
         if (this.avatarPath == null || this.avatarPath.isBlank()) return null;
