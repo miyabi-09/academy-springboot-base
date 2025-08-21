@@ -1,18 +1,16 @@
 package com.spring.springbootapplication.config;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.spring.springbootapplication.service.MyUserDetailsService;
+import org.springframework.http.HttpMethod; 
 
 import jakarta.servlet.DispatcherType;
 
@@ -41,6 +39,7 @@ public class WebSecurityConfig {
             // 認証の設定: 記載したURLパターンを許可
             .authorizeHttpRequests(auth -> auth
             .dispatcherTypeMatchers(DispatcherType.ERROR, DispatcherType.FORWARD).permitAll()
+            .requestMatchers("/users/*/avatar").permitAll()
             .requestMatchers("/css/**","/js/**","/images/**","/uploads/**","/error","/error/**","/debug/**").permitAll()
             .requestMatchers("/login", "/register").permitAll()
             .anyRequest().authenticated()  // それ以外は認証が必要
