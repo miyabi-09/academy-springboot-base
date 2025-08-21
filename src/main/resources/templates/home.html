@@ -27,7 +27,7 @@
                     <!-- プロフィール写真 -->
                     <div class="profile-photo">
                         <div class="photo-placeholder">
-                            <img th:src="${user.avatarUrl} != null ? @{${user.avatarUrl}} : @{/images/default_profile.png}" alt="プロフィール画像" class="profile-img">
+                            <img th:with="ts=${user != null && user.updatedAt != null ? #temporals.format(user.updatedAt,'yyyyMMddHHmmss') : 0}" th:src="@{'/users/' + ${user.id} + '/avatar'(ts=${ts})}" alt="avatar" class="profile-img" onerror="this.src='/images/default_profile.png'">
                         </div>
                         <p class="user-name" th:text="${user?.name}"></p>
                     </div>
@@ -36,7 +36,7 @@
                     <div class="profile-content">
                         <h1 class="profile-title">自己紹介</h1>
                         <p class="profile-text" th:text="${#strings.isEmpty(user?.introduction) ? '自己紹介がまだ未登録です' : user.introduction}"></p>
-                        <a href="/profile/edit" class="submit-profile-btn">自己紹介を編集する</a> 
+                        <a th:href="@{/profile/edit}" class="submit-profile-btn">自己紹介を編集する</a>
                     </div>
                 </div>
 
@@ -44,7 +44,7 @@
                 <div class="study-section">
                     <div class="study-content">
                         <h1 class="study-title">学習チャート</h1>
-                        <a href="/skills" class="submit-edit-btn">編集する</a> 
+                        <a th:href="@{/skills}" class="submit-edit-btn">編集する</a>
                     </div>
                 </div>
             </div>

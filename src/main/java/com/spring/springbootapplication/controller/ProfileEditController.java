@@ -77,22 +77,19 @@ public class ProfileEditController {
         user.setIntroduction(v);
 
         // 画像アップロード
+        // 画像アップロード（DBへ保存）
+        // 画像アップロード（DBへ保存）
         if (image != null && !image.isEmpty()) {
-            try (var in = image.getInputStream()) {
-                Path dir = Paths.get("uploads");
-                Files.createDirectories(dir);
-                String filename = UUID.randomUUID() + "_" + (image.getOriginalFilename() == null ? "image" : image.getOriginalFilename());
-                Path dest = dir.resolve(filename);
-                Files.copy(in, dest, StandardCopyOption.REPLACE_EXISTING);
-                user.setAvatarPath("/uploads/" + filename);
-                user.setAvatarPath(filename); 
+            try {
+                userService.updateAvatar(user.getId(), image);
             } catch (Exception e) {
-                System.err.println("画像保存に失敗: " + e.getMessage());
-                ra.addFlashAttribute("error", "画像の保存に失敗しました");
-                ra.addFlashAttribute("form", Map.of("introduction", v));
-                return "redirect:/profile/edit";
-            }
+         // 画面に文言は出さない。入力値だけ戻す
+        ra.addFlashAttribute("form", Map.of("introduction", v));
+        return "redirect:/profile/edit";
+}
+
         }
+
 
         // 4) 保存
         userService.saveProfile(user);

@@ -14,10 +14,13 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Transient;
+import jakarta.persistence.Basic;
+import jakarta.persistence.FetchType;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Email;
+
 
 @Entity
 @Table(name = "users")
@@ -55,6 +58,12 @@ public class User {
     @Column(name = "avatar_path", length = 255)
     private String avatarPath; // プロフィール画像のファイルパス
 
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "avatar_data")
+    private byte[] avatarData;
+
+    @Column(name = "avatar_mime", length = 100)
+    private String avatarMime;
 
 
     // --- getter・setter ---
@@ -108,6 +117,7 @@ public class User {
         this.introduction = introduction;
     }
 
+    // 互換：/uploads/ を先頭に付けて返す（旧ファイル保存方式用）
     @Transient
     public String getAvatarUrl() {
         if (this.avatarPath == null || this.avatarPath.isBlank()) return null;
@@ -116,13 +126,22 @@ public class User {
                 : "/uploads/" + this.avatarPath;
     }
 
+    // 互換：/uploads/ が付いていたら剥がしてDBにはファイル名のみ保存
     public void setAvatarPath(String avatarPath) {
-    // 先頭に /uploads/ が付いていたら剥がして DB には「ファイル名だけ」を保存
-    if (avatarPath != null && avatarPath.startsWith("/uploads/")) {
-        this.avatarPath = avatarPath.substring("/uploads/".length());
-    } else {
-        this.avatarPath = avatarPath;
+        if (avatarPath != null && avatarPath.startsWith("/uploads/")) {
+            this.avatarPath = avatarPath.substring("/uploads/".length());
+        } else {
+            this.avatarPath = avatarPath;
+        }
     }
-}
+
+    // 追加（User.java のクラス末尾あたりに）
+public byte[] getAvatarData() { return avatarData; }
+public void setAvatarData(byte[] avatarData) { this.avatarData = avatarData; }
+
+public String getAvatarMime() { return avatarMime; }
+public void setAvatarMime(String avatarMime) { this.avatarMime = avatarMime; }
 
 }
+
+
