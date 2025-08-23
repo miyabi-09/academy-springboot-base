@@ -31,11 +31,17 @@ p {
 
 
 /* プロフィール画像 */
-.profile-img {
-    width: 360px; 
+.photo-placeholder{
+    width: 360px;
     height: 360px;
-    object-fit: cover;  /* 枠内に画像収める */
-    border-radius: 50%; 
+    border-radius: 50%;
+    overflow: hidden; /* 画像が枠をはみ出さないようにする */
+}
+
+.profile-img {
+    width: 100%; 
+    height: 100%;
+    object-fit: contain;  /* 枠内に画像収める */
 }
 
 /* デフォルト画像用 */
@@ -46,10 +52,8 @@ p {
     border-radius: 50%;
 }
 
-
 /* プロフィールコンテンツ */
 .profile-title{
-    /* margin: 52px 0 32px 0;*/
     margin: 0 0 32px 0;
     font-size: 36px;
     font-weight: bold;
@@ -104,7 +108,6 @@ p {
     background-color: #144564;
     cursor: pointer;
 }
-
 
 
 /* 学習チャート */
