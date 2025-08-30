@@ -68,6 +68,11 @@ h2 {
     background-color: #1B5678;
 }
 
+.skill-edit-btn:hover {
+    background-color: #144564;
+    cursor: pointer;
+}
+
 /* 見出し（項目名 / 学習時間）を細く */
 .skills-list thead th{
   font-weight: 300;  /* もっと細く → 200 / 普通に → normal(400) */
