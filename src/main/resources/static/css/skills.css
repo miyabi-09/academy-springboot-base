@@ -1,1 +1,314 @@
 @import url('/css/common.css');
+
+/* ========== ヘッダー/レイアウト ========== */
+.skills-header {
+  width: 960px;
+  margin: 40px 0 87px 0;
+}
+
+.skills-container {
+  width: 960px;
+  margin: 0 auto;
+}
+
+.category-box {
+  width: 960px;
+  height: 436px;
+  border-radius: 8px;
+  border: 1px solid #00000080;
+  padding: 40px;
+  margin-bottom: 40px;
+  box-sizing: border-box;
+  display: flex;           /* 内側を縦並び */
+  flex-direction: column;
+  overflow: hidden;        /* はみ出しカット */
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+h2 { 
+    margin: 0; 
+}
+
+.category-title {
+  font-size: 24px;
+  font-weight: 700;
+  flex-grow: 1;
+  position: relative;
+}
+
+
+.category-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -10px;
+  width: 240px;
+  height: 2px;
+  background-color: #00000080;
+}
+
+.skill-edit-btn {
+  box-sizing: border-box;
+  width: 178px;
+  height: 48px;
+  font-size: 14px;
+  margin-left: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  border: none;
+  color: #FFFFFF;
+  background-color: #1B5678;
+}
+
+/* 見出し（項目名 / 学習時間）を細く */
+.skills-list thead th{
+  font-weight: 300;  /* もっと細く → 200 / 普通に → normal(400) */
+}
+
+/* ========== 月プルダウン（カスタム） ========== */
+
+.select-wrap { 
+  position: relative; 
+  display: inline-block; 
+  margin-bottom: 40px;   /* 下方向の全体余白はここで管理 */
+}
+.month-dropdown-btn{ 
+  margin: 0;             /* ここに margin-bottom を持たせない */
+}
+
+.select-wrap { position: relative; display: inline-block; }
+
+.month-menu{
+  position: absolute;
+  left: 0;
+  top: 100%;        /* ボタンの直下 */
+  margin-top: 16px; /* ← ここで距離を16pxに */
+}
+
+.month-dropdown-btn{
+  min-width: 94px;
+  height: 44px;
+  box-sizing: border-box;
+  padding: 8px 16px;
+  font-size: 24px;
+  font-weight: bold;
+  border: 1px solid #DDDDDD;
+  border-radius: 8px;
+  background: #fff;
+  color: #000;
+  display: inline-flex;
+  align-items: center;
+}
+
+.month-dropdown-btn .caret{
+  font-size: 16px;
+  margin-left: auto;
+}
+
+.month-dropdown-btn:hover{ background: #DDDDDD; }
+
+
+.select-wrap { position: relative; display: inline-block; }
+
+
+.month-menu{
+  box-sizing: border-box;
+  min-width: 94px;
+  margin: 0;
+  padding: 6px 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #DDD;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.15);
+  z-index: 50;
+  position: absolute;
+  left: 0;
+  top: 100%;        /* ボタンの直下 */
+  margin-top: 16px; /* ← ここで距離を16pxに */
+  
+}
+
+.month-menu li{
+  padding: 10px 16px;
+  font-size: 20px;
+  line-height: 1.2;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.month-menu li:hover,
+.month-menu li:focus{ background: #F2F6FA; outline: none; }
+.month-menu li.is-selected{ background: #E6EEF6; font-weight: 700; }
+
+/* ========== スクロールテーブル（skills用に限定） ========== */
+.skills-list {
+  flex: 1 1 auto;   /* 残り高さを占有 */
+  min-height: 0;    /* これ超重要：flex内での溢れ防止 */
+  width: 880px;
+  height: auto;
+  margin: 0;
+  overflow-y: auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+/* 行ボーダー方式で安定させる（小数px回避） */
+.skills-list table {
+  width: 100%;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+/* セルの線は消す（行に線を引く） */
+.skills-list th,
+.skills-list td {
+  border-bottom: 1px solid #E0E0E0 !important;
+  box-sizing: border-box;
+  padding: 0 8px;
+  font-size: 14px;
+}
+
+/* 高さ固定（見た目） */
+.skills-list thead th { height: 57px; }
+.skills-list tbody td { height: 72px; }
+
+/* ヘッダー固定＋下線 */
+.skills-list thead {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 2;
+}
+.skills-list thead th {
+  border-bottom: 1px solid #E0E0E0 !important;
+}
+
+/* 各行に下線（最後は不要なら下で消せる） */
+.skills-list tbody tr {
+  border-bottom: 1px solid #E0E0E0 !important;
+}
+/* .skills-list tbody tr:last-child { border-bottom: none !important; } */
+
+/* 列幅とアライメント */
+.skills-list th:nth-of-type(1),
+.skills-list td:nth-of-type(1) {
+  width: 240px;
+  text-align: left;
+  padding-left: 50px;
+}
+.skills-list th:nth-of-type(2),
+.skills-list td:nth-of-type(2) {
+  width: 240px;
+  text-align: left;
+  padding-left: 16px;
+}
+.skills-list td:nth-of-type(3) {
+  text-align: left;
+  padding-left: 26px;
+  padding-right: 40px;
+  width: auto; /* ボタン列は伸縮 */
+}
+
+/* ========== 分数入力（160×40）＋ カスタム▲▼ ========== */
+.number-stepper {
+  position: relative;
+  width: 160px;
+  height: 40px;
+}
+
+.learning-hours-input {
+    width: 160px;
+    height: 40px;
+    box-sizing: border-box;          /* 外寸を160×40に固定 */
+    padding: 8px 30px 8px 12px;      /* 右側は▲▼スペース */
+    font-size: 14px;
+    border: 1px solid #0000003B;
+    border-radius: 4px;
+}
+
+/* ネイティブのスピンは消す（見た目を統一） */
+input.minutes-input[type="number"] {
+    -moz-appearance: textfield;
+}
+input.minutes-input[type="number"]::-webkit-inner-spin-button,
+input.minutes-input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+
+}
+
+/* 右側に縦並びの▲▼ */
+.number-stepper .step {
+    position: absolute;
+    right: 2px;
+    width: 22px;
+    height: 20px;
+    line-height: 12px;
+    text-align: center;
+    font-size: 10px;
+    color: #00000080;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+    user-select: none;
+    padding: 0;
+}
+.number-stepper .step.up   { top: 4px; }
+.number-stepper .step.down { bottom: 4px; }
+.number-stepper .step:hover { background: rgba(0,0,0,0.06); }
+.number-stepper .step:focus { outline: none; }
+
+/* ========== ボタン（右列） ========== */
+.input-button-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 88px;
+}
+
+/* 保存 */
+button.small-btn {
+  width: 158px !important;
+  height: 32px !important;
+  font-size: 14px !important;
+  line-height: 32px;
+  padding: 0;
+  border: 1px solid #1B5678;
+  color: #1B5678;
+  background: #FFFFFF;
+  border-radius: 4px;
+}
+button.small-btn:hover {
+  background: #1B5678;
+  color: #FFFFFF;
+  cursor: pointer;
+}
+
+/* 削除 */
+button.delete-btn {
+  width: 88px !important;
+  height: 32px !important;
+  font-size: 14px !important;
+  line-height: 32px;
+  background: #EE6969;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+}
+button.delete-btn:hover {
+  background: #CC4C4C;
+  cursor: pointer;
+}
+
+/* 念のため固定幅 */
+button.small-btn,
+button.delete-btn { flex: 0 0 auto; }

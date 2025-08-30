@@ -3,6 +3,7 @@ package com.spring.springbootapplication.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -23,7 +24,7 @@ import jakarta.validation.constraints.Size;
 
 
 @Entity
-@Table(name = "larning_data")
+@Table(name = "learning_data")
 @EntityListeners(AuditingEntityListener.class)
 public class LearningData {
 
@@ -48,13 +49,14 @@ public class LearningData {
     private LocalDate studyMonth; // 学習実施月
 
     @Column(name = "study_time", nullable = false)
-    private LocalDate studyTime; // 学習時間
+    private Integer studyTime; // 学習時間
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt; // 登録日時
 
     @LastModifiedDate
-    @Column(name = "updated_at", nullable = false, updatable = false)
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt; // 更新日時
 
     // --- getter・setter ---
@@ -86,10 +88,10 @@ public class LearningData {
         this.name = name;
     }
 
-    public LocalDate getStudyTime() {
+    public Integer getStudyTime() {
         return studyTime;
     }
-    public void setStudyTime(LocalDate studyTime) {
+    public void setStudyTime(Integer studyTime) {
         this.studyTime = studyTime;
     }
 
