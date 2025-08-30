@@ -78,7 +78,7 @@ h2 {
 .select-wrap { 
     position: relative; 
     display: inline-block; 
-  margin-bottom: 40px;   /* 下方向の全体余白はここで管理 */
+    margin-bottom: 40px;   /* 下方向の全体余白はここで管理 */
 }
 .month-dropdown-btn{ 
   margin: 0;             /* ここに margin-bottom を持たせない */
@@ -89,8 +89,8 @@ h2 {
 .month-menu{
     position: absolute;
     left: 0;
-  top: 100%;        /* ボタンの直下 */
-  margin-top: 16px; /* ← ここで距離を16pxに */
+    top: 100%;        /* ボタンの直下 */
+    margin-top: 16px; /* ← ここで距離を16pxに */
 }
 
 .month-dropdown-btn{
@@ -99,6 +99,7 @@ h2 {
     box-sizing: border-box;
     padding: 8px 16px;
     font-size: 24px;
+    font-family: Roboto;
     font-weight: bold;
     border: 1px solid #DDDDDD;
     border-radius: 4px;
@@ -109,7 +110,7 @@ h2 {
 }
 
 .month-dropdown-btn .caret{
-    font-size: 16px;
+    font-size: 13px;
     margin-left: auto;
 }
 
