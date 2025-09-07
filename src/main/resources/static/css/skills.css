@@ -1,10 +1,10 @@
 @import url('/css/common.css');
 
-/* ========== ヘッダー/レイアウト ========== */
+/* ========== レイアウト / ヘッダー ========== */
 .skills-header {
     width: 960px;
     margin: 40px 0 87px 0;
-}
+    }
 
 .skills-container {
     width: 960px;
@@ -19,9 +19,9 @@
     padding: 40px;
     margin-bottom: 40px;
     box-sizing: border-box;
-    display: flex;           /* 内側を縦並び */
+    display: flex;
     flex-direction: column;
-    overflow: hidden;        /* はみ出しカット */
+    overflow: hidden;
 }
 
 .category-header {
@@ -31,8 +31,8 @@
     margin-bottom: 30px;
 }
 
-h2 { 
-    margin: 0; 
+h2 {
+    margin: 0;
 }
 
 .category-title {
@@ -40,8 +40,9 @@ h2 {
     font-weight: 700;
     flex-grow: 1;
     position: relative;
-}
+    color: #000000BF;
 
+    }
 
 .category-title::after {
     content: "";
@@ -64,68 +65,55 @@ h2 {
     align-items: center;
     border-radius: 4px;
     border: none;
-    color: #FFFFFF;
+    color: #fff;
     background-color: #1B5678;
 }
-
 .skill-edit-btn:hover {
     background-color: #144564;
     cursor: pointer;
 }
 
-/* 見出し（項目名 / 学習時間）を細く */
-.skills-list thead th{
-  font-weight: 300;  /* もっと細く → 200 / 普通に → normal(400) */
+/* 見出し（細く） */
+.skills-list thead th {
+    font-weight: 300;
 }
 
 /* ========== 月プルダウン（カスタム） ========== */
-
-.select-wrap { 
-    position: relative; 
-    display: inline-block; 
-    margin-bottom: 40px;   /* 下方向の全体余白はここで管理 */
-}
-.month-dropdown-btn{ 
-  margin: 0;             /* ここに margin-bottom を持たせない */
+.select-wrap {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 40px;
+    z-index: 1000; /* テーブルより前面 */
 }
 
-.select-wrap { position: relative; display: inline-block; }
-
-.month-menu{
-    position: absolute;
-    left: 0;
-    top: 100%;        /* ボタンの直下 */
-    margin-top: 16px; /* ← ここで距離を16pxに */
-}
-
-.month-dropdown-btn{
+.month-dropdown-btn {
     min-width: 94px;
     height: 44px;
     box-sizing: border-box;
     padding: 8px 16px;
     font-size: 24px;
-    font-family: Roboto;
+    font-family: Roboto, system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
     font-weight: bold;
-    border: 1px solid #DDDDDD;
+    border: 1px solid #DDD;
     border-radius: 4px;
     background: #fff;
     color: #000;
     display: inline-flex;
     align-items: center;
+    margin: 0;
+    cursor: pointer;
 }
-
-.month-dropdown-btn .caret{
+.month-dropdown-btn .caret {
     font-size: 13px;
     margin-left: auto;
 }
+.month-dropdown-btn:hover { background: #DDD; }
 
-.month-dropdown-btn:hover{ background: #DDDDDD; }
-
-
-.select-wrap { position: relative; display: inline-block; }
-
-
-.month-menu{
+.month-menu {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    margin-top: 16px;
     box-sizing: border-box;
     min-width: 94px;
     margin: 0;
@@ -134,15 +122,12 @@ h2 {
     background: #fff;
     border: 1px solid #DDD;
     border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.15);
-    z-index: 50;
-    position: absolute;
-    left: 0;
-  top: 100%;        /* ボタンの直下 */
-  margin-top: 16px; /* ← ここで距離を16pxに */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .15);
+    z-index: 2000; /* ボタンより前面 */
 }
+.month-menu[hidden] { display: none !important; }
 
-.month-menu li{
+.month-menu li {
     padding: 10px 16px;
     font-size: 20px;
     line-height: 1.2;
@@ -150,29 +135,31 @@ h2 {
     white-space: nowrap;
 }
 .month-menu li:hover,
-.month-menu li:focus{ background: #F2F6FA; outline: none; }
-.month-menu li.is-selected{ background: #E6EEF6; font-weight: 700; }
+.month-menu li:focus {
+    background: #F2F6FA;
+    outline: none;
+}
+.month-menu li.is-selected {
+    background: #E6EEF6;
+    font-weight: 700;
+}
 
-/* ========== スクロールテーブル（skills用に限定） ========== */
+/* ========== スクロールテーブル ========== */
 .skills-list {
-    flex: 1 1 auto;   /* 残り高さを占有 */
-    min-height: 0;    /* これ超重要：flex内での溢れ防止 */
+    flex: 1 1 auto;
+    min-height: 0;           /* flex 内での溢れ防止 */
     width: 880px;
     height: auto;
     margin: 0;
     overflow-y: auto;
     border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
 }
-
-/* 行ボーダー方式で安定させる（小数px回避） */
 .skills-list table {
     width: 100%;
     border-collapse: separate !important;
     border-spacing: 0 !important;
 }
-
-/* セルの線は消す（行に線を引く） */
 .skills-list th,
 .skills-list td {
     border-bottom: 1px solid #E0E0E0 !important;
@@ -180,12 +167,9 @@ h2 {
     padding: 0 8px;
     font-size: 14px;
 }
-
-/* 高さ固定（見た目） */
 .skills-list thead th { height: 57px; }
 .skills-list tbody td { height: 72px; }
 
-/* ヘッダー固定＋下線 */
 .skills-list thead {
     position: sticky;
     top: 0;
@@ -195,14 +179,11 @@ h2 {
 .skills-list thead th {
     border-bottom: 1px solid #E0E0E0 !important;
 }
-
-/* 各行に下線（最後は不要なら下で消せる） */
 .skills-list tbody tr {
     border-bottom: 1px solid #E0E0E0 !important;
 }
-/* .skills-list tbody tr:last-child { border-bottom: none !important; } */
 
-/* 列幅とアライメント */
+/* 列幅 */
 .skills-list th:nth-of-type(1),
 .skills-list td:nth-of-type(1) {
     width: 240px;
@@ -222,40 +203,38 @@ h2 {
     width: auto; /* ボタン列は伸縮 */
 }
 
-/* ========== 分数入力（160×40）＋ カスタム▲▼ ========== */
+/* ========== 分数入力（160×40）＋ 常時▲▼ ========== */
 .number-stepper {
     position: relative;
     width: 160px;
     height: 40px;
 }
-
 .learning-hours-input {
     width: 160px;
     height: 40px;
-    box-sizing: border-box;          /* 外寸を160×40に固定 */
-    padding: 8px 30px 8px 12px;      /* 右側は▲▼スペース */
+    box-sizing: border-box;
+    padding: 8px 46px 8px 12px; /* 右側にボタン分の余白 */
     font-size: 14px;
     border: 1px solid #0000003B;
     border-radius: 4px;
+    position: relative;
+    z-index: 1; /* ▲▼の下、でも入力が手前に来る */
 }
 
-/* ネイティブのスピンは消す（見た目を統一） */
-input.minutes-input[type="number"] {
-    -moz-appearance: textfield;
-}
+/* ネイティブのスピンは消す（見た目統一） */
+input.minutes-input[type="number"] { -moz-appearance: textfield; }
 input.minutes-input[type="number"]::-webkit-inner-spin-button,
 input.minutes-input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
-
 }
 
-/* 右側に縦並びの▲▼ */
-.number-stepper .step {
+/* ▲▼常時表示（他CSSのhover制御を上書き） */
+.skills-list .number-stepper .step {
     position: absolute;
     right: 2px;
-    width: 22px;
-    height: 20px;
+    width: 15px;
+    height: 18px;
     line-height: 12px;
     text-align: center;
     font-size: 10px;
@@ -266,21 +245,32 @@ input.minutes-input[type="number"]::-webkit-outer-spin-button {
     cursor: pointer;
     user-select: none;
     padding: 0;
-}
-.number-stepper .step.up   { top: 4px; }
-.number-stepper .step.down { bottom: 4px; }
-.number-stepper .step:hover { background: rgba(0,0,0,0.06); }
-.number-stepper .step:focus { outline: none; }
 
-/* ========== ボタン（右列） ========== */
+    display: inline-flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    z-index: 2;
+}
+.skills-list .number-stepper .step.up   { top: 7px; }
+.skills-list .number-stepper .step.down { bottom: 2px; }
+.skills-list .number-stepper .step:hover { background: rgba(0, 0, 0, .06); }
+
+/* 念のため：hover時ルールがあっても常時表示を維持 */
+.skills-list .number-stepper:hover .step,
+.skills-list .number-stepper:focus-within .step {
+    display: inline-flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* ========== 保存 / 削除 ボタン ========== */
 .input-button-wrapper {
     display: flex;
     justify-content: flex-end;
     align-items: center;
     gap: 88px;
 }
-
-/* 保存 */
 button.small-btn {
     width: 158px !important;
     height: 32px !important;
@@ -289,16 +279,14 @@ button.small-btn {
     padding: 0;
     border: 1px solid #1B5678;
     color: #1B5678;
-    background: #FFFFFF;
+    background: #fff;
     border-radius: 4px;
 }
 button.small-btn:hover {
     background: #1B5678;
-    color: #FFFFFF;
+    color: #fff;
     cursor: pointer;
 }
-
-/* 削除 */
 button.delete-btn {
     width: 88px !important;
     height: 32px !important;
@@ -313,7 +301,49 @@ button.delete-btn:hover {
     background: #CC4C4C;
     cursor: pointer;
 }
-
-/* 念のため固定幅 */
 button.small-btn,
-button.delete-btn { flex: 0 0 auto; }
+button.delete-btn {
+    flex: 0 0 auto;
+}
+
+/* ▼▼ skills.css の一番下あたりに追記（テーブル用） ▼▼ */
+/* ボタン本体：位置・クリック範囲 */
+.skills-list .number-stepper { position: relative; }
+.skills-list .learning-hours-input { padding-right: 46px; } /* 右に三角分の余白 */
+
+.skills-list .number-stepper .step{
+    position: absolute;
+    right: 3px;                 /* 入力の右端からの距離 */
+    width: 22px; height: 18px;  /* クリックしやすい大きさ */
+    display: inline-flex; align-items: center; justify-content: center;
+    background: transparent; border: none; padding: 0; cursor: pointer;
+    z-index: 2;
+    }
+
+/* 位置（下げたい場合は数値を大きく） */
+.skills-list .number-stepper .step.up   { top: 8px; }   /* ←ここで“下げる”調整 */
+.skills-list .number-stepper .step.down { bottom: 4px; }
+
+/* 三角そのもの（10×5の三角、色 #0000008A） */
+.skills-list .number-stepper .step::before{
+    content: ""; display: block; width: 0; height: 0;
+}
+.skills-list .number-stepper .step.up::before{
+  /* 上は ▲：左右5px、下5px を塗る → 10×5 */
+    border-left: 5px solid transparent;
+    border-right:5px solid transparent;
+    border-bottom:5px solid #0000008A;
+}
+.skills-list .number-stepper .step.down::before{
+  /* 下は ▼：左右5px、上5px を塗る → 10×5 */
+    border-left: 5px solid transparent;
+    border-right:5px solid transparent;
+    border-top:   5px solid #0000008A;
+}
+
+/* ネイティブのスピンは消す（Chrome/Safari/Firefox） */
+input.minutes-input[type="number"] { -moz-appearance: textfield; }
+input.minutes-input[type="number"]::-webkit-inner-spin-button,
+input.minutes-input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none; margin: 0;
+}
