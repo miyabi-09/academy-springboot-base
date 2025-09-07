@@ -7,7 +7,8 @@
     <meta name="description" content="ポートフォリオです">
     <title>項目一覧ページ</title>
     <link rel="stylesheet" href="/css/common.css">
-    <link rel="stylesheet" href="/css/skills.css">
+    <link rel="stylesheet" href="/css/skills.css?v=20250907_03">
+
 </head>
 
 <body>
@@ -25,40 +26,35 @@
         <div class="skills-header">
 
             <!-- プルダウン -->
-            <form id="monthForm" th:action="@{/skills}" method="get" class="select-wrap">
-                <button type="button"
-                        id="monthBtn"
-                        class="month-dropdown-btn"
-                        aria-haspopup="listbox"
-                        aria-expanded="false">
-                    <span id="monthLabel" th:text="${selectedMonthLabel}">8月</span>
-                    <span class="caret">▼</span>
+        <div class="select-wrap">
+            <button type="button" id="monthBtn" class="month-dropdown-btn" aria-haspopup="listbox" aria-expanded="false">
+                <span id="monthLabel" th:text="${selectedMonthLabel}">9月</span>
+                <span class="caret">▼</span>
                 </button>
 
                 <ul id="monthMenu" class="month-menu" role="listbox" hidden>
-                    <li th:each="m : ${months}"
-                        role="option"
-                        th:data-value="${m.value()}"
-                        th:attr="aria-selected=${m.value()==selectedMonth}"
-                        th:classappend="${m.value()==selectedMonth} ? ' is-selected'"
-                        th:text="${m.label()}">
-                    7月
-                    </li>
+                <li th:each="m : ${months}"
+                    role="option"
+                    th:attr="data-value=${m.value()}, aria-selected=${m.value()==selectedMonth}"
+                    th:classappend="${m.value()==selectedMonth} ? ' is-selected'"
+                    th:text="${m.label()}">
+                    9月
+                </li>
                 </ul>
 
-                <input type="hidden" name="month" id="monthInput" th:value="${selectedMonth}">
-            </form>
-
-
-
+                <form id="monthForm" th:action="@{/skills}" method="get">
+                    <input type="hidden" name="month" id="monthInput" th:value="${selectedMonth}">
+                </form>
+        </div>  
 
             <div class="skills-container">
                 <!-- バックエンド -->
                 <div class="category-box">
                     <div class="category-header">
                         <h2 class="category-title">バックエンド</h2>
-                        <a href="#" class="skill-edit-btn" data-category-id="1" data-category-name="バックエンド" 
-                            onclick="navigateToSkillNew(this)">項目を追加する</a>
+                        <a class="skill-edit-btn"
+                            th:href="@{/skills/new(categoryName='バックエンド', month=${selectedMonth})}">
+                            項目を追加する</a>   
                     </div>
                     <div class="skills-list">
                         <table>
@@ -69,7 +65,54 @@
                                     <th aria-hidden="true"></th>
                                 </tr>
                             </thead>
-                            <tbody id="tbody-backend"></tbody>
+                            <!-- バックエンド -->
+                            <tbody id="tbody-backend"
+                                th:with="list=${skills.?[category.name == 'バックエンド']}">
+                                <tr th:each="s : ${list}">
+                                    <td th:text="${s.name}"></td>
+                                    <td>
+                                    <div class="number-stepper">
+                                        <input type="number"
+                                            class="learning-hours-input minutes-input"
+                                            min="0" max="1440" step="1" inputmode="numeric"
+                                            th:value="${s.studyTime}"
+                                            th:attr="data-id=${s.id}, data-category=${s.category.name}">
+                                        <button type="button" class="step up"   aria-label="1分増やす"></button>
+                                        <button type="button" class="step down" aria-label="1分減らす"></button>
+                                    </div>
+                                    </td>
+                                    
+                                    <td class="input-button-wrapper">
+                                        <!-- 保存 -->
+                                        <form th:action="@{/skills/update}" method="post" style="display:inline;">
+                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                            <input type="hidden" name="id"    th:value="${s.id}" />
+                                            <input type="hidden" name="month" th:value="${selectedMonth}" />
+                                            <!-- JSがここに minutes を詰めます（initSaveFormsGlue） -->
+                                            <input type="hidden" name="minutes" value="" />
+                                            <button type="submit" class="small-btn save-btn"
+                                                    th:attr="data-id=${s.id}, data-category=${s.category.name}">
+                                            学習時間を保存する
+                                            </button>
+                                        </form>
+
+                                        <!-- 削除 -->
+                                        <form th:action="@{/skills/delete}" method="post" style="display:inline;"
+                                                onsubmit="return confirm('削除してよろしいですか？');">
+                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                            <input type="hidden" name="id"    th:value="${s.id}" />
+                                            <input type="hidden" name="month" th:value="${selectedMonth}" />
+                                            <button type="submit" class="delete-btn"
+                                                    th:attr="data-id=${s.id}, data-category=${s.category.name}">
+                                            削除する
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(list)}">
+                                    <td colspan="3" style="text-align:center;color:#666;">データがありません</td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -78,8 +121,9 @@
                 <div class="category-box">
                     <div class="category-header">
                         <h2 class="category-title">フロントエンド</h2>
-                        <a href="#" class="skill-edit-btn" data-category-id="1" data-category-name="フロントエンド" 
-                            onclick="navigateToSkillNew(this)">項目を追加する</a>
+                        <a class="skill-edit-btn"
+                        th:href="@{/skills/new(categoryName='フロントエンド', month=${selectedMonth})}">
+                        項目を追加する</a>
                     </div>
                     <div class="skills-list">
                         <table>
@@ -90,7 +134,55 @@
                                     <th aria-hidden="true"></th>
                                 </tr>
                             </thead>
-                            <tbody id="tbody-frontend"></tbody>
+                            <!-- フロントエンド -->
+                            <tbody id="tbody-frontend"
+                                th:with="list=${skills.?[category.name == 'フロントエンド']}">
+                            <tr th:each="s : ${list}">
+                                <td th:text="${s.name}"></td>
+                                <td>
+                                <div class="number-stepper">
+                                    <input type="number"
+                                        class="learning-hours-input minutes-input"
+                                        min="0" max="1440" step="1" inputmode="numeric"
+                                        th:value="${s.studyTime}"
+                                        th:attr="data-id=${s.id}, data-category=${s.category.name}">
+                                        <button type="button" class="step up"   aria-label="1分増やす"></button>
+                                    <button type="button" class="step down" aria-label="1分減らす"></button>
+                                </div>
+                                </td>
+                                
+                                <td class="input-button-wrapper">
+                                    <!-- 保存 -->
+                                    <form th:action="@{/skills/update}" method="post" style="display:inline;">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                        <input type="hidden" name="id"    th:value="${s.id}" />
+                                        <input type="hidden" name="month" th:value="${selectedMonth}" />
+                                        <!-- JSがここに minutes を詰めます（initSaveFormsGlue） -->
+                                        <input type="hidden" name="minutes" value="" />
+                                        <button type="submit" class="small-btn save-btn"
+                                                th:attr="data-id=${s.id}, data-category=${s.category.name}">
+                                        学習時間を保存する
+                                        </button>
+                                    </form>
+
+                                    <!-- 削除 -->
+                                    <form th:action="@{/skills/delete}" method="post" style="display:inline;"
+                                            onsubmit="return confirm('削除してよろしいですか？');">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                        <input type="hidden" name="id"    th:value="${s.id}" />
+                                        <input type="hidden" name="month" th:value="${selectedMonth}" />
+                                        <button type="submit" class="delete-btn"
+                                                th:attr="data-id=${s.id}, data-category=${s.category.name}">
+                                        削除する
+                                        </button>
+                                    </form>
+                                </td>
+
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(list)}">
+                                <td colspan="3" style="text-align:center;color:#666;">データがありません</td>
+                            </tr>
+                        </tbody>
                         </table>
                     </div>
                 </div>
@@ -99,8 +191,9 @@
                 <div class="category-box">
                     <div class="category-header">
                         <h2 class="category-title">インフラ</h2>
-                        <a href="#" class="skill-edit-btn" data-category-id="1" data-category-name="インフラ" 
-                            onclick="navigateToSkillNew(this)">項目を追加する</a>
+                        <a class="skill-edit-btn"
+                            th:href="@{/skills/new(categoryName='インフラ', month=${selectedMonth})}">
+                            項目を追加する</a>          
                     </div>
                     <div class="skills-list">
                         <table>
@@ -111,7 +204,54 @@
                                     <th aria-hidden="true"></th>
                                 </tr>
                             </thead>
-                        <tbody id="tbody-infra"></tbody>
+                            <!-- インフラ -->
+                            <tbody id="tbody-infra"
+                                th:with="list=${skills.?[category.name == 'インフラ']}">
+                            <tr th:each="s : ${list}">
+                                <td th:text="${s.name}"></td>
+                                <td>
+                                <div class="number-stepper">
+                                    <input type="number"
+                                        class="learning-hours-input minutes-input"
+                                        min="0" max="1440" step="1" inputmode="numeric"
+                                        th:value="${s.studyTime}"
+                                        th:attr="data-id=${s.id}, data-category=${s.category.name}">
+                                    <button type="button" class="step up"   aria-label="1分増やす"></button>
+                                    <button type="button" class="step down" aria-label="1分減らす"></button>
+                                </div>
+                                </td>
+                                <td class="input-button-wrapper">
+                                    <!-- 保存 -->
+                                    <form th:action="@{/skills/update}" method="post" style="display:inline;">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                        <input type="hidden" name="id"    th:value="${s.id}" />
+                                        <input type="hidden" name="month" th:value="${selectedMonth}" />
+                                        <!-- JSがここに minutes を詰めます（initSaveFormsGlue） -->
+                                        <input type="hidden" name="minutes" value="" />
+                                        <button type="submit" class="small-btn save-btn"
+                                                th:attr="data-id=${s.id}, data-category=${s.category.name}">
+                                        学習時間を保存する
+                                        </button>
+                                    </form>
+
+                                    <!-- 削除 -->
+                                    <form th:action="@{/skills/delete}" method="post" style="display:inline;"
+                                            onsubmit="return confirm('削除してよろしいですか？');">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                        <input type="hidden" name="id"    th:value="${s.id}" />
+                                        <input type="hidden" name="month" th:value="${selectedMonth}" />
+                                        <button type="submit" class="delete-btn"
+                                                th:attr="data-id=${s.id}, data-category=${s.category.name}">
+                                        削除する
+                                        </button>
+                                    </form>
+                                </td>
+
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(list)}">
+                                <td colspan="3" style="text-align:center;color:#666;">データがありません</td>
+                            </tr>
+                        </tbody>
                         </table>
                     </div>
                 </div>
@@ -125,7 +265,6 @@
         <div class="footer">portfolio site</div>
     </footer>
 
-    <script defer src="/js/skills.js?v=20250824_1"></script>
-
+    <script defer src="/js/skills.js?v=20250907_01"></script>
 </body>
 </html>

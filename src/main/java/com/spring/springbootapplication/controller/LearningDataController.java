@@ -22,10 +22,10 @@ public class LearningDataController {
         this.userService = userService;
     }
 
-    @GetMapping("/skills")
+    @GetMapping("/skills-legacy")
     public String showSkills(@RequestParam(value = "month", required = false) String month,
-                             Authentication auth,
-                             Model model) {
+                            Authentication auth,
+                            Model model) {
         // （必要なら）未ログインを弾く
         if (auth == null || !auth.isAuthenticated()) {
             return "redirect:/login";

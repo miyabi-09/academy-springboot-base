@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
@@ -24,7 +25,13 @@ import jakarta.validation.constraints.Size;
 
 
 @Entity
-@Table(name = "learning_data")
+@Table(
+    name = "learning_data",
+    uniqueConstraints = @UniqueConstraint(
+        name = "ux_learning_unique",
+        columnNames = {"user_id","category_id","study_month","name"}
+    )
+)
 @EntityListeners(AuditingEntityListener.class)
 public class LearningData {
 

@@ -1,0 +1,264 @@
+@import url('/css/common.css');
+
+/* 自己紹介セクション全体 */
+h1, p {
+    margin-block-start: 0;
+    margin-block-end: 0;
+}
+
+p {
+    font-size: 18px;
+    color: #000000BF;
+}
+
+.user-name {
+    margin: 10px 0 21px 0;
+    font-size: 20px;
+    font-weight: 400;
+    text-align: center;
+}
+
+.profile-content{
+    width: 520px;
+    /*margin-top: 60px;*/
+    text-align: left;
+    min-width: 0; /* ← flex子要素が内容幅で広がるのを抑止 */
+}
+
+/* 学習チャート */
+.study-content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.study-title{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 36px;
+    font-weight: bold;
+    color: #000000BF;
+}
+
+.study-title::after {
+    content: '';
+    display: block;
+    width: 400px; 
+    height: 2px; 
+    background-color: rgba(0, 0, 0, 0.5); /* 黒で50%透明 */
+    margin: 16px auto 40px;
+}
+
+.submit-edit-btn{
+    width: 152px;
+    height: 53px;
+    font-size: 18px;
+    border: none;
+    text-decoration: none;  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    color: #FFFFFF;
+    background: #1B5678;
+}
+
+.submit-edit-btn:hover {
+    background-color: #144564;
+    cursor: pointer;
+}
+
+.form-control {
+    font-size: 16px;
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.42);
+    margin-top: 8px;
+    padding: 0 0 2.5px 0;
+}
+.form-control {
+    padding: 2.5px 0;
+}
+
+/* ヘルパーテキスト（ボーダー直下に出す） */
+.form-group .form-helper{
+    display:block;
+    margin-top: 3px;       /* 下線との距離 */
+    font-size: 10px;
+    line-height: 1.4;
+    color:  #0000008A;        /* 薄いグレー */
+}
+
+
+/* 入力幅に合わせたい場合（number-stepper と同じ左寄せに） */
+.form-group .number-stepper + .form-helper{
+  max-width: 520px;      /* あなたのフォーム幅に合わせる */
+}
+
+
+/* ====== 学習時間（フォーム専用）ステッパー：置き換え ====== */
+
+/* コンテナ */
+.form-group .number-stepper{
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    /* 三角サイズ・間隔（お好みで調整） */
+    --arrow-w: 5px;   /* 左右の幅 */
+    --arrow-h: 5px;   /* 三角の高さ */
+    --tri-gap: 5px;   /* 上下ボタンの中心からの離れ量 */
+}
+
+/* 入力本体（右側に三角ぶん余白を確保） */
+.form-group .number-stepper .learning-hours-input{
+    width: 100%; 
+    height: 21.5px;                     
+    box-sizing: border-box;
+    line-height: 40px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ネイティブのスピン非表示 */
+#studyTime { -moz-appearance: textfield; }
+#studyTime::-webkit-inner-spin-button,
+#studyTime::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* 三角ボタン（常時表示＆しっかりした当たり判定） */
+.form-group .number-stepper .step{
+    position: absolute;
+    right: 8px;
+        width: 20px;             /* クリックしやすい幅に */
+    height: 12px;            /* クリックしやすい高さに */
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: #0000008A;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+/* 中央基準で上下にずらす → 逆転しない */
+.form-group .number-stepper .step.up   { top: 8.5px;}
+.form-group .number-stepper .step.down { bottom: 1px; }
+
+/* 三角はCSSだけで描画 */
+.form-group .number-stepper .step::before{
+    content: ""; display: block; width: 0; height: 0;
+    border-left:  var(--arrow-w) solid transparent;
+    border-right: var(--arrow-w) solid transparent;
+}
+.form-group .number-stepper .step.up::before  { border-bottom: var(--arrow-h) solid currentColor; } /* ▲ */
+.form-group .number-stepper .step.down::before{ border-top:    var(--arrow-h) solid currentColor; } /* ▼ */
+
+.form-group .number-stepper .step:hover{ background: rgba(0,0,0,.06); border-radius: 2px; }
+
+/* ほかのhoverで消されない保険 */
+.form-group .number-stepper:hover .step,
+.form-group .number-stepper:focus-within .step{
+    display: inline-flex !important; opacity: 1 !important; visibility: visible !important;
+}
+
+/* 既存の「hover時だけ表示」系があっても常時表示を維持 */
+.form-group .number-stepper:hover .step,
+.form-group .number-stepper:focus-within .step{
+    display: inline-flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* ====== 保存完了モーダル（#addedModal）を以前のデザインに戻す ====== */
+
+/* 画面の暗幕 */
+#addedModal::backdrop{
+    background: rgba(0,0,0,.6);
+    background-image: linear-gradient(0deg, rgba(0,0,0,.2), rgba(0,0,0,.2));
+    backdrop-filter: blur(1px);
+}
+
+/* 本体カード */
+#addedModal{
+    width: 640px;
+    height: 240px;
+    max-height: 90vh;
+    padding: 24px 32px;
+
+    border: none;
+    background: #fff;
+    padding: 24px 32px;
+    box-shadow: 0 12px 36px rgba(0,0,0,.25);
+
+    /* 中身のレイアウト */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: Roboto, system-ui, -apple-system, "Segoe UI",
+                "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+}
+
+/* メッセージ */
+#addedModal .added-msg{
+    margin: 0;
+    text-align: center;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #000000BF;
+    word-break: keep-all;
+}
+
+/* ボタン行 */
+#addedModal .modal-btn-wrapper{
+    display: flex;
+    justify-content: center;
+    border: none;
+}
+
+/* 「編集ページに戻る」ボタン */
+#addedModal .modal-btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 192px;
+    height: 48px;
+    margin-top: 40px;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    background: #1B5678;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+}
+#addedModal .modal-btn:hover{ background:#144564; }
+
+/* 小さく表示されてしまうUAスタイルへの保険 */
+dialog#addedModal{ max-height: 90vh; overflow: visible; }
+
+/* 項目名の「青くなる」対策 ─ 青リング/青下線を無効化 */
+#name {
+    border: none;
+    border-bottom: 1px solid #9AA0A6;  /* 常にグレーの下線 */
+    background: #fff;
+    color: #111;
+}
+
+/* フォーカス時も色を変えない（青にしない） */
+#name:focus,
+#name:focus-visible {
+    border-bottom-color: #9AA0A6;  /* ←ここがポイント */             
+    box-shadow: none;              /* Safari等のフォーカス影を無効 */
+}
+
+/* Chromeの自動入力で色が変わるのも抑止（黄色や青み対策） */
+#name:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+    -webkit-text-fill-color: #111 !important;
+    transition: background-color 9999s ease-in-out 0s;
+    }
