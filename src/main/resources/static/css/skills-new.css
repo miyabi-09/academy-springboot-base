@@ -93,20 +93,20 @@ p {
 }
 
 
-/* 入力幅に合わせたい場合（number-stepper と同じ左寄せに） */
+/* 入力幅に合わせる */
 .form-group .number-stepper + .form-helper{
-  max-width: 520px;      /* あなたのフォーム幅に合わせる */
+    max-width: 520px;   
 }
 
 
-/* ====== 学習時間（フォーム専用）ステッパー：置き換え ====== */
+/* ====== 学習時間（フォーム専用） ====== */
 
 /* コンテナ */
 .form-group .number-stepper{
     position: relative;
     display: inline-block;
     max-width: 100%;
-    /* 三角サイズ・間隔（お好みで調整） */
+    /* 三角サイズ・間隔 */
     --arrow-w: 5px;   /* 左右の幅 */
     --arrow-h: 5px;   /* 三角の高さ */
     --tri-gap: 5px;   /* 上下ボタンの中心からの離れ量 */
@@ -131,7 +131,7 @@ p {
 .form-group .number-stepper .step{
     position: absolute;
     right: 8px;
-        width: 20px;             /* クリックしやすい幅に */
+    width: 20px;             /* クリックしやすい幅に */
     height: 12px;            /* クリックしやすい高さに */
     display: inline-flex !important;
     align-items: center;
@@ -143,6 +143,7 @@ p {
     cursor: pointer;
     z-index: 2;
 }
+
 /* 中央基準で上下にずらす → 逆転しない */
 .form-group .number-stepper .step.up   { top: 8.5px;}
 .form-group .number-stepper .step.down { bottom: 1px; }
@@ -172,7 +173,7 @@ p {
     visibility: visible !important;
 }
 
-/* ====== 保存完了モーダル（#addedModal）を以前のデザインに戻す ====== */
+/* ====== 保存完了モーダル ====== */
 
 /* 画面の暗幕 */
 #addedModal::backdrop{
@@ -228,20 +229,35 @@ p {
     width: 192px;
     height: 48px;
     margin-top: 40px;
-    border: none;
     border-radius: 4px;
     text-decoration: none;
     background: #1B5678;
     color: #fff;
     font-size: 14px;
     cursor: pointer;
+    outline: none !important;
+    box-shadow: none !important;          /* Bootstrap系の青い影対策 */
+    border: none;                          
+    -webkit-tap-highlight-color: transparent; /* iOSのタップ時ハイライトを消す */
 }
+
+/* フォーカス・クリック中も出さない */
+#addedModal .modal-btn:focus,
+#addedModal .modal-btn:focus-visible,
+#addedModal .modal-btn:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
 #addedModal .modal-btn:hover{ background:#144564; }
 
 /* 小さく表示されてしまうUAスタイルへの保険 */
-dialog#addedModal{ max-height: 90vh; overflow: visible; }
+dialog#addedModal{ 
+    max-height: 90vh; 
+    overflow: visible;
+}
 
-/* 項目名の「青くなる」対策 ─ 青リング/青下線を無効化 */
+/* 項目名の青下線を無効化 */
 #name {
     border: none;
     border-bottom: 1px solid #9AA0A6;  /* 常にグレーの下線 */
