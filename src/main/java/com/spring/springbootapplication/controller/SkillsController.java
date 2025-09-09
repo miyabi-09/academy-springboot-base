@@ -58,10 +58,10 @@ public class SkillsController {
     // 追加保存（PRG）
     @PostMapping("/skills/new")
     public String create(@Valid @ModelAttribute("userForm") SkillsDTO form,
-                         BindingResult br,
-                         @RequestParam String categoryName,
-                         RedirectAttributes ra,  // ★ 使う
-                         Model model) {
+                        BindingResult br,
+                        @RequestParam String categoryName,
+                        RedirectAttributes ra,  // ★ 使う
+                        Model model) {
 
         // 失敗時の再描画用
         model.addAttribute("categoryName", categoryName);
@@ -73,7 +73,7 @@ public class SkillsController {
             boolean dup = learningDataService.existsByUserMonthCategoryAndName(
                     getLoginUserId(), form.getMonth(), categoryName, name);
             if (dup) {
-                br.rejectValue("name", "duplicate", name + " は既に登録されています");
+                br.rejectValue("name", "duplicate", name + "は既に登録されています");
             }
         }
 

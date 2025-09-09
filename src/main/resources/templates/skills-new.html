@@ -15,7 +15,7 @@
     <div class="wrapper">
 
     <header class="header">
-        <div class="header-logo">My Portfolio</div>
+        <a class="header-logo" th:href="@{/home}" aria-label="トップへ">My Portfolio</a>
             <form th:action="@{/logout}" method="post" style="display:inline;">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <button type="submit" class="header-button">ログアウト</button>
@@ -85,7 +85,7 @@
     <p class="added-msg">
         <span th:text="${addedCategory}">バックエンド</span>に
         <span th:text="${addedName}">java</span>を<br>
-        <span th:text="${addedStudyTime}">2</span>分追加しました！
+        <span th:text="${addedStudyTime}">2</span>分で追加しました！
     </p>
     <div class="modal-btn-wrapper">
         <a class="modal-btn" th:href="@{/skills(month=${selectedMonth})}">編集ページに戻る</a>
