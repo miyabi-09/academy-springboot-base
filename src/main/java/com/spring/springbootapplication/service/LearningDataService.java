@@ -137,4 +137,14 @@ public class LearningDataService {
         }
         public String getName() { return name; }
     }
+
+    // 学習時間を更新
+public LearningData updateMinutes(Long userId, Integer id, int minutes) {
+    int safe = Math.max(0, Math.min(minutes, 1440)); // 0〜1440に丸める
+    LearningData ld = repo.findByIdAndUser_Id(id, userId)
+        .orElseThrow(() -> new IllegalArgumentException("データが見つかりません (id=" + id + ")"));
+    ld.setStudyTime(safe);
+    return repo.save(ld);
+}
+
 }

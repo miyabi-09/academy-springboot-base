@@ -7,11 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initSaveFormsGlue();
 });
 
-/* =========================
-   月プルダウン（ボタン＋ul）
-   - li[role="option"][data-value="yyyy-MM"] をクリックで
-     hidden #monthInput にセットして /skills?month=yyyy-MM で送信
-   ========================= */
+
+// 月プルダウン（ボタン＋ul）
 function initMonthDropdown() {
   const form  = document.getElementById('monthForm');
   const btn   = document.getElementById('monthBtn');
@@ -85,10 +82,8 @@ function initMonthDropdown() {
   });
 }
 
-/* =========================
-   ▲▼ステッパー
-   - 同じ行の input.minutes-input を +1 / -1
-   ========================= */
+
+   // ▲▼ステッパー
 function initStepper() {
   document.addEventListener('click', (e) => {
     const stepBtn = e.target.closest('.number-stepper .step');
@@ -111,11 +106,8 @@ function initStepper() {
   });
 }
 
-/* =========================
-   保存フォーム連携
-   - 「保存」フォーム送信前に hidden[name="minutes"] へ
-     行の .minutes-input の値を詰める
-   ========================= */
+
+  // 保存フォーム連携
 function initSaveFormsGlue() {
   document.addEventListener('submit', (e) => {
     const form = e.target;
@@ -147,3 +139,56 @@ function monthJpLabel(isoYm) {
   const m = Number(String(isoYm || '').split('-')[1] || 0);
   return m ? `${m}月` : '';
 }
+
+// --- 編集完了モーダルを表示 ---
+(function () {
+  function showEditDoneModal() {
+    const dlg = document.getElementById('addedModal') || document.getElementById('editDoneModal');
+    if (!dlg) return;
+
+    // 開く
+    if (typeof dlg.showModal === 'function') {
+      if (!dlg.open) dlg.showModal();
+    } else {
+      dlg.setAttribute('open', '');
+    }
+
+    // ===== ここから後始末（残像対策） =====
+    const forceRepaint = () => {
+      // 同期reflowで::backdropの塗りを確実に消す
+      void document.body.offsetHeight;
+    };
+
+    // 「閉じた」後に強制再描画 → ついでにDOMから取り除くと最も確実
+    dlg.addEventListener('close', () => {
+      // まれにclose直後はpaintが残るので、次フレームで処理
+      requestAnimationFrame(() => {
+        forceRepaint();
+        dlg.remove();  // 同ページで再表示しないならremoveが一番キレイ
+      });
+    });
+
+    // Escで閉じた/cancelされた時も同様に掃除
+    dlg.addEventListener('cancel', () => {
+      requestAnimationFrame(() => {
+        forceRepaint();
+        dlg.remove();
+      });
+    });
+
+    // フォームボタン(method="dialog")で閉じる場合の保険
+    dlg.querySelector('.modal-btn')?.addEventListener('click', () => {
+      // method="dialog"で自動closeされるけど、二重で呼んでもOK
+      dlg.close();
+    });
+    // ===== 後始末ここまで =====
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', showEditDoneModal);
+  } else {
+    showEditDoneModal();
+  }
+})();
+
+

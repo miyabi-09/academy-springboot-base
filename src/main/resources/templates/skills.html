@@ -6,9 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="ポートフォリオです">
     <title>項目一覧ページ</title>
-    <link rel="stylesheet" href="/css/common.css">
-    <link rel="stylesheet" href="/css/skills.css?v=20250907_03">
-
+    <link rel="stylesheet" th:href="@{/css/common.css(v=${T(java.time.LocalDate).now()})}">
+    <link rel="stylesheet" th:href="@{/css/skills.css(v=${T(java.time.LocalDateTime).now().toString()})}">
 </head>
 
 <body>
@@ -45,7 +44,8 @@
                 <form id="monthForm" th:action="@{/skills}" method="get">
                     <input type="hidden" name="month" id="monthInput" th:value="${selectedMonth}">
                 </form>
-        </div>  
+        </div> 
+        </div>   
 
             <div class="skills-container">
                 <!-- バックエンド -->
@@ -264,6 +264,16 @@
         <div class="footer">portfolio site</div>
     </footer>
 
-    <script defer src="/js/skills.js?v=20250907_01"></script>
+    <!-- 追加：保存完了モーダル（flash が来ているときだけ描画） -->
+    <dialog class="modal-wrapper" id="addedModal" th:if="${editSuccess}">
+        <p class="added-msg"
+            th:text="${editedName} + 'を保存しました！'">
+        </p>
+        <form method="dialog" class="modal-btn-wrapper">
+            <button class="modal-btn">編集ページに戻る</button>
+        </form>
+    </dialog>
+
+    <script defer th:src="@{/js/skills.js(v=${T(java.time.LocalDateTime).now().toString()})}"></script>
 </body>
 </html>
