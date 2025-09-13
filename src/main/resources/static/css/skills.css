@@ -174,7 +174,7 @@ h2 {
     position: sticky;
     top: 0;
     background: #fff;
-    z-index: 2;
+    z-index: 100;
 }
 .skills-list thead th {
     border-bottom: 1px solid #E0E0E0 !important;
