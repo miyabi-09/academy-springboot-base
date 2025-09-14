@@ -147,4 +147,15 @@ public LearningData updateMinutes(Long userId, Integer id, int minutes) {
     return repo.save(ld);
 }
 
+    // 学習時間を削除
+public LearningData deleteByIdForUser(Long userId, Integer id) {
+    LearningData ld = repo.findByIdAndUser_Id(id, userId)
+        .orElseThrow(() -> new IllegalArgumentException("データが見つかりません (id=" + id + ")"));
+    ld.getCategory().getName();
+    ld.getName();
+
+    repo.delete(ld);
+
+    return ld; 
+}
 }

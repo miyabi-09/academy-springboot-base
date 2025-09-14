@@ -13,6 +13,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.lang.ProcessBuilder.Redirect;
 import java.time.YearMonth;
 import java.util.List;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @Controller
 public class LearningDataController {
@@ -84,4 +86,23 @@ public class LearningDataController {
         // 認証導入前のダミー実装
         return 1L;
     }
+
+    @PostMapping("/skills/delete")
+    public String delete(
+        @RequestParam Integer id,
+        @RequestParam String month,
+        RedirectAttributes ra) {
+
+        Long userId = getLoginUserId();
+       // 表示用メッセージに使うなら削除前に取得
+    var target = learningDataService.deleteByIdForUser(userId, id);
+
+        ra.addFlashAttribute("deleteSuccess", true);
+        ra.addFlashAttribute("deletedCategory", target.getCategory().getName());
+        ra.addFlashAttribute("deletedName", target.getName());
+
+        String normalized = learningDataService.normalizeYm(month);
+        return"redirect:/skills?month=" + normalized;
+        }
+    
 }
