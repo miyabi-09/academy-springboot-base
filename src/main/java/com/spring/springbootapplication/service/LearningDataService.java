@@ -17,6 +17,7 @@ import com.spring.springbootapplication.entity.LearningData;
 import com.spring.springbootapplication.entity.User;
 import com.spring.springbootapplication.repository.CategoryRepository;
 import com.spring.springbootapplication.repository.LearningDataRepository;
+import com.spring.springbootapplication.dto.CategoryTotalDTO;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -158,4 +159,13 @@ public LearningData deleteByIdForUser(Long userId, Integer id) {
 
     return ld; 
 }
+
+// LearningDataService.java
+@Transactional(readOnly = true)
+public List<CategoryTotalDTO> getCategoryTotalsByStrMonth(Long userId, String ym){
+    LocalDate monthStart = toStudyMonth(ym);      // yyyy-MM-01
+    LocalDate monthEnd   = monthStart.plusMonths(1);
+    return repo.findCategoryTotalsByUserAndMonthRange(userId, monthStart, monthEnd);
+}
+
 }

@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initSaveFormsGlue();
 });
 
-
 // 月プルダウン（ボタン＋ul）
 function initMonthDropdown() {
   const form  = document.getElementById('monthForm');
@@ -17,7 +16,6 @@ function initMonthDropdown() {
   const input = document.getElementById('monthInput');
   if (!form || !btn || !menu || !label || !input) return;
 
-  // （保険）サーバが li を出せなかったときは当月+過去2ヶ月を自前で生成
   if (menu.children.length === 0) {
     const selected = input.value || ym(0);
     [0, 1, 2].forEach(i => {
@@ -35,7 +33,6 @@ function initMonthDropdown() {
     label.textContent = monthJpLabel(selected);
   }
 
-  // 開閉
   btn.addEventListener('click', (e) => {
     e.preventDefault();
     const open = btn.getAttribute('aria-expanded') === 'true';
@@ -43,13 +40,12 @@ function initMonthDropdown() {
     menu.hidden = open;
   });
 
-  // 選択 → hidden へ反映 → 送信
   menu.addEventListener('click', (e) => {
     const li = e.target.closest('li[role="option"]');
     if (!li) return;
 
-    const value = li.getAttribute('data-value');  // "yyyy-MM"
-    const text  = li.textContent.trim();         // "M月"
+    const value = li.getAttribute('data-value');
+    const text  = li.textContent.trim();
 
     input.value = value;
     label.textContent = text;
@@ -67,7 +63,6 @@ function initMonthDropdown() {
     form.submit(); // /skills?month=yyyy-MM
   });
 
-  // 外側クリック/ESCで閉じる
   document.addEventListener('click', (e) => {
     if (menu.hidden) return;
     if (e.target === btn || btn.contains(e.target) || menu.contains(e.target)) return;
@@ -82,8 +77,7 @@ function initMonthDropdown() {
   });
 }
 
-
-   // ▲▼ステッパー
+// ▲▼ステッパー（1分刻み・0〜1440の範囲）
 function initStepper() {
   document.addEventListener('click', (e) => {
     const stepBtn = e.target.closest('.number-stepper .step');
@@ -102,27 +96,70 @@ function initStepper() {
     if (v > max) v = max;
 
     input.value = String(v);
-    input.dispatchEvent(new Event('change', { bubbles: true }));
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+
   });
+
+  // 入力確定時（change/blur）のみ 0〜1440 に正規化
+function normalizeMinutesInput(el) {
+  let s = el.value.trim();
+  if (s === '') {                 // 空のまま確定したら 0
+    el.value = '0';
+    return;
+  }
+  let n = Number(s);
+  if (!Number.isFinite(n)) n = 0;
+  n = Math.round(Math.max(0, Math.min(n, 1440)));
+  el.value = String(n);
 }
 
+document.addEventListener('change', (e) => {
+  const el = e.target;
+  if (el instanceof HTMLInputElement && el.classList.contains('minutes-input')) {
+    normalizeMinutesInput(el);
+  }
+});
 
-  // 保存フォーム連携
+document.addEventListener('blur', (e) => {
+  const el = e.target;
+  if (el instanceof HTMLInputElement && el.classList.contains('minutes-input')) {
+    normalizeMinutesInput(el);
+  }
+}, true); // キャプチャで blur を拾う
+
+
+// 保存フォーム連携（hidden minutes に詰めてから送信）
 function initSaveFormsGlue() {
   document.addEventListener('submit', (e) => {
     const form = e.target;
     if (!(form instanceof HTMLFormElement)) return;
 
-    // 保存フォームの見分け方：hidden minutes を持っている
+    // 「保存フォーム」のみ対象：hidden minutes を持っているかで判定
     const hidden = form.querySelector('input[type="hidden"][name="minutes"]');
     if (!hidden) return;
 
-    // 同じ行の分数を取得
-    const row = form.closest('tr');
-    const minutesInput = row?.querySelector('.minutes-input');
-    if (minutesInput) {
-      hidden.value = minutesInput.value || '0';
+    // まず同じ行から minutes-input を探す
+    let minutesInput = form.closest('tr')?.querySelector('.minutes-input');
+
+    // 行が掴めないケースの保険：id一致で探す
+    if (!minutesInput) {
+      const idField = form.querySelector('input[name="id"]');
+      const idVal = idField && idField.value ? idField.value : null;
+      if (idVal) {
+        minutesInput = document.querySelector(`.minutes-input[data-id="${CSS.escape(idVal)}"]`);
+      }
     }
+
+    // それでも見つからなければ 0 扱い（送信は継続）
+    let n = 0;
+    if (minutesInput) {
+      const v = Number(minutesInput.value);
+      n = Number.isFinite(v) ? v : 0;
+    }
+
+    // 1分単位で 0〜1440 に丸めて hidden へ
+    n = Math.round(Math.max(0, Math.min(n, 1440)));
+    hidden.value = String(n);
   });
 }
 
@@ -140,7 +177,7 @@ function monthJpLabel(isoYm) {
   return m ? `${m}月` : '';
 }
 
-// --- 編集完了モーダルを表示 ---
+// --- 編集完了モーダルを表示（残像対策付き） ---
 (function () {
   function showEditDoneModal() {
     const dlg = document.getElementById('deletedModal')
@@ -148,39 +185,20 @@ function monthJpLabel(isoYm) {
             || document.getElementById('editDoneModal');
     if (!dlg) return;
 
-    // 開く
     if (typeof dlg.showModal === 'function') {
       if (!dlg.open) dlg.showModal();
     } else {
       dlg.setAttribute('open', '');
     }
 
-    // ===== ここから後始末（残像対策） =====
-    const forceRepaint = () => {
-      void document.body.offsetHeight;
-    };
-
-    // 「閉じた」後に強制再描画 → ついでにDOMから取り除くと最も確実
+    const forceRepaint = () => { void document.body.offsetHeight; };
     dlg.addEventListener('close', () => {
-      requestAnimationFrame(() => {
-        forceRepaint();
-        dlg.remove();  
-      });
+      requestAnimationFrame(() => { forceRepaint(); dlg.remove(); });
     });
-
-    // Escで閉じた/cancelされた時も同様に掃除
     dlg.addEventListener('cancel', () => {
-      requestAnimationFrame(() => {
-        forceRepaint();
-        dlg.remove();
-      });
+      requestAnimationFrame(() => { forceRepaint(); dlg.remove(); });
     });
-
-    // フォームボタン(method="dialog")で閉じる場合の保険
-    dlg.querySelector('.modal-btn')?.addEventListener('click', () => {
-      dlg.close();
-    });
-    // ===== 後始末ここまで =====
+    dlg.querySelector('.modal-btn')?.addEventListener('click', () => dlg.close());
   }
 
   if (document.readyState === 'loading') {
@@ -189,5 +207,4 @@ function monthJpLabel(isoYm) {
     showEditDoneModal();
   }
 })();
-
-
+}

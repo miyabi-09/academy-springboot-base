@@ -41,7 +41,7 @@
                 </li>
                 </ul>
 
-                <form id="monthForm" th:action="@{/skills}" method="get">
+                <form id="monthForm" th:action="@{/skills-legacy}" method="get">
                     <input type="hidden" name="month" id="monthInput" th:value="${selectedMonth}">
                 </form>
         </div> 
@@ -72,11 +72,13 @@
                                     <td th:text="${s.name}"></td>
                                     <td>
                                     <div class="number-stepper">
-                                        <input type="number"
+                                        <input type="number" 
+                                            name="minutes"    
                                             class="learning-hours-input minutes-input"
                                             min="0" max="1440" step="1" inputmode="numeric"
                                             th:value="${s.studyTime}"
-                                            th:attr="data-id=${s.id}, data-category=${s.category.name}">
+                                            th:attr="data-id=${s.id}, data-category=${s.category.name}"
+                                            th:attrappend="form=${'saveForm__' + s.id}">
                                         <button type="button" class="step up"   aria-label="1分増やす"></button>
                                         <button type="button" class="step down" aria-label="1分減らす"></button>
                                     </div>
@@ -84,12 +86,10 @@
                                     
                                     <td class="input-button-wrapper">
                                         <!-- 保存 -->
-                                        <form th:action="@{/skills/update}" method="post" style="display:inline;">
+                                        <form th:action="@{/skills/update}" method="post" style="display:inline;" th:attr="id=${'saveForm__' + s.id}">
                                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                                             <input type="hidden" name="id"    th:value="${s.id}" />
                                             <input type="hidden" name="month" th:value="${selectedMonth}" />
-                                            <!-- JSがここに minutes を詰めます（initSaveFormsGlue） -->
-                                            <input type="hidden" name="minutes" value="" />
                                             <button type="submit" class="small-btn save-btn"
                                                     th:attr="data-id=${s.id}, data-category=${s.category.name}">
                                             学習時間を保存する
@@ -140,11 +140,13 @@
                                 <td th:text="${s.name}"></td>
                                 <td>
                                 <div class="number-stepper">
-                                    <input type="number"
+                                    <input type="number" 
+                                        name="minutes"    
                                         class="learning-hours-input minutes-input"
                                         min="0" max="1440" step="1" inputmode="numeric"
                                         th:value="${s.studyTime}"
-                                        th:attr="data-id=${s.id}, data-category=${s.category.name}">
+                                        th:attr="data-id=${s.id}, data-category=${s.category.name}"
+                                        th:attrappend="form=${'saveForm__' + s.id}">
                                         <button type="button" class="step up"   aria-label="1分増やす"></button>
                                     <button type="button" class="step down" aria-label="1分減らす"></button>
                                 </div>
@@ -152,12 +154,10 @@
                                 
                                 <td class="input-button-wrapper">
                                     <!-- 保存 -->
-                                    <form th:action="@{/skills/update}" method="post" style="display:inline;">
+                                    <form th:action="@{/skills/update}" method="post" style="display:inline;" th:attr="id=${'saveForm__' + s.id}">
                                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                                         <input type="hidden" name="id"    th:value="${s.id}" />
                                         <input type="hidden" name="month" th:value="${selectedMonth}" />
-                                        <!-- JSがここに minutes を詰めます（initSaveFormsGlue） -->
-                                        <input type="hidden" name="minutes" value="" />
                                         <button type="submit" class="small-btn save-btn"
                                                 th:attr="data-id=${s.id}, data-category=${s.category.name}">
                                         学習時間を保存する
@@ -209,23 +209,24 @@
                                 <td th:text="${s.name}"></td>
                                 <td>
                                 <div class="number-stepper">
-                                    <input type="number"
+                                    <input type="number" 
+                                        name="minutes"    
                                         class="learning-hours-input minutes-input"
                                         min="0" max="1440" step="1" inputmode="numeric"
                                         th:value="${s.studyTime}"
-                                        th:attr="data-id=${s.id}, data-category=${s.category.name}">
+                                        th:attr="data-id=${s.id}, data-category=${s.category.name}"
+                                        th:attrappend="form=${'saveForm__' + s.id}">
                                     <button type="button" class="step up"   aria-label="1分増やす"></button>
                                     <button type="button" class="step down" aria-label="1分減らす"></button>
                                 </div>
                                 </td>
                                 <td class="input-button-wrapper">
                                     <!-- 保存 -->
-                                    <form th:action="@{/skills/update}" method="post" style="display:inline;">
+                                    <form th:action="@{/skills/update}" method="post" style="display:inline;" th:attr="id=${'saveForm__' + s.id}">
+
                                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                                         <input type="hidden" name="id"    th:value="${s.id}" />
                                         <input type="hidden" name="month" th:value="${selectedMonth}" />
-                                        <!-- JSがここに minutes を詰めます（initSaveFormsGlue） -->
-                                        <input type="hidden" name="minutes" value="" />
                                         <button type="submit" class="small-btn save-btn"
                                                 th:attr="data-id=${s.id}, data-category=${s.category.name}">
                                         学習時間を保存する
@@ -261,10 +262,12 @@
         <div class="footer">portfolio site</div>
     </footer>
 
-    <!-- 追加：保存完了モーダル（flash が来ているときだけ描画） -->
+    <!-- 保存/追加 完了モーダル（flash が来ているときだけ描画） -->
     <dialog class="modal-wrapper" id="addedModal" th:if="${editSuccess}">
-        <p class="added-msg"
-            th:text="${editedName} + 'を保存しました！'">
+        <p class="added-msg">
+            <span th:text="${editedCategory}">バックエンド</span>に
+            <span th:text="${editedName}">java</span>を<br>
+            <span th:text="${editedMinutes}">0</span>分で保存しました！
         </p>
         <form method="dialog" class="modal-btn-wrapper">
             <button class="modal-btn">編集ページに戻る</button>
@@ -280,7 +283,7 @@
             <button class="modal-btn">編集ページに戻る</button>
         </form>
     </dialog>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script defer th:src="@{/js/skills.js(v=${T(java.time.LocalDateTime).now().toString()})}"></script>
 </body>
 </html>

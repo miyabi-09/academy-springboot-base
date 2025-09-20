@@ -6,7 +6,10 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import com.spring.springbootapplication.dto.CategoryTotalDTO;
 import com.spring.springbootapplication.entity.LearningData;
 
 public interface LearningDataRepository extends JpaRepository<LearningData, Integer> {
@@ -53,10 +56,29 @@ public interface LearningDataRepository extends JpaRepository<LearningData, Inte
         LocalDate startDate,
         LocalDate endDate
     );
+    // 一覧（Service.listByUserAndYm が呼ぶやつ）
+List<LearningData> findByUser_IdAndStudyMonthOrderByIdDesc(
+    Long userId,
+    LocalDate studyMonth
+);
+// グラフ用：カテゴリ別合計（DTOを返す）← これが肝
+@Query("""
+    select new com.spring.springbootapplication.dto.CategoryTotalDTO(
+      ld.category.name,
+      coalesce(sum(ld.studyTime), 0)
+    )
+    from LearningData ld
+    where ld.user.id = :userId
+      and ld.studyMonth >= :monthStart
+      and ld.studyMonth < :monthEnd
+    group by ld.category.name
+    order by ld.category.name
+  """)
 
     // 月の一覧（ID降順）
-    List<LearningData> findByUser_IdAndStudyMonthOrderByIdDesc(
-        Long userId,
-        LocalDate studyMonth
-    );
+    List<CategoryTotalDTO> findCategoryTotalsByUserAndMonthRange(
+    @Param("userId") Long userId,
+    @Param("monthStart") LocalDate monthStart,
+    @Param("monthEnd") LocalDate monthEnd
+);
 }

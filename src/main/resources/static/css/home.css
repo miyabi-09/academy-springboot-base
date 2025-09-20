@@ -111,11 +111,16 @@ p {
 
 
 /* 学習チャート */
+
+.learningChart{
+    margin-top: 46px; 
+}
+
 .study-content{
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: 81.5px;
 }
 
 .study-title{
