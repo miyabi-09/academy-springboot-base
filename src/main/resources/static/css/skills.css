@@ -453,3 +453,87 @@ dialog#addedModal{
     -webkit-text-fill-color: #111 !important;
     transition: background-color 9999s ease-in-out 0s;
     }
+
+    
+    /* ====== 削除完了モーダル ====== */
+
+/* 画面の暗幕 */
+#deletedModal::backdrop{
+    background: rgba(0,0,0,.6);
+    background-image: linear-gradient(0deg, rgba(0,0,0,.2), rgba(0,0,0,.2));
+    backdrop-filter: blur(1px);
+}
+
+/* 本体カード */
+#deletedModal{
+    width: 640px;
+    height: 240px;
+    max-height: 90vh;
+    padding: 24px 32px;
+
+    border: none;
+    background: #fff;
+    padding: 24px 32px;
+    box-shadow: 0 12px 36px rgba(0,0,0,.25);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: Roboto, system-ui, -apple-system, "Segoe UI",
+                "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+}
+
+/* メッセージ */
+#deletedModal .added-msg{
+    margin: 0;
+    text-align: center;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #000000BF;
+    word-break: keep-all;
+}
+
+/* ボタン行 */
+#deletedModal .modal-btn-wrapper{
+    display: flex;
+    justify-content: center;
+    border: none;
+}
+
+/* 「編集ページに戻る」ボタン */
+#deletedModal .modal-btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 192px;
+    height: 48px;
+    margin-top: 40px;
+    border-radius: 4px;
+    text-decoration: none;
+    background: #1B5678;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none !important;
+    box-shadow: none !important;
+    border: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* フォーカス・クリック中も出さない */
+#deletedModal .modal-btn:focus,
+#deletedModal .modal-btn:focus-visible,
+#deletedModal .modal-btn:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+#deletedModal .modal-btn:hover{ background:#144564; }
+
+/* 小さく表示されてしまうUAスタイルへの保険 */
+dialog#deletedModal{
+    max-height: 90vh;
+    overflow: visible;
+}

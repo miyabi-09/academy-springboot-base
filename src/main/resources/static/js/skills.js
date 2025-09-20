@@ -143,7 +143,9 @@ function monthJpLabel(isoYm) {
 // --- 編集完了モーダルを表示 ---
 (function () {
   function showEditDoneModal() {
-    const dlg = document.getElementById('addedModal') || document.getElementById('editDoneModal');
+    const dlg = document.getElementById('deletedModal')
+            || document.getElementById('addedModal')
+            || document.getElementById('editDoneModal');
     if (!dlg) return;
 
     // 開く
@@ -155,16 +157,14 @@ function monthJpLabel(isoYm) {
 
     // ===== ここから後始末（残像対策） =====
     const forceRepaint = () => {
-      // 同期reflowで::backdropの塗りを確実に消す
       void document.body.offsetHeight;
     };
 
     // 「閉じた」後に強制再描画 → ついでにDOMから取り除くと最も確実
     dlg.addEventListener('close', () => {
-      // まれにclose直後はpaintが残るので、次フレームで処理
       requestAnimationFrame(() => {
         forceRepaint();
-        dlg.remove();  // 同ページで再表示しないならremoveが一番キレイ
+        dlg.remove();  
       });
     });
 
@@ -178,7 +178,6 @@ function monthJpLabel(isoYm) {
 
     // フォームボタン(method="dialog")で閉じる場合の保険
     dlg.querySelector('.modal-btn')?.addEventListener('click', () => {
-      // method="dialog"で自動closeされるけど、二重で呼んでもOK
       dlg.close();
     });
     // ===== 後始末ここまで =====
