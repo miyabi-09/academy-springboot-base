@@ -187,8 +187,42 @@ function monthJpLabel(isoYm) {
     dlg.setAttribute('open', '');     // 念のため
   }
 
+<<<<<<< HEAD
   // 閉じたらDOMから取り除いて残像防止（任意）
   const cleanup = () => dlg.remove();
   dlg.addEventListener('close', cleanup, { once: true });
   dlg.addEventListener('cancel', cleanup, { once: true });
 })();
+=======
+// 1) submit を一度きりに（クリック/Enter/自動再送すべて対応）
+document.addEventListener('submit', (e) => {
+  const form = e.target.closest('form.delete-form');
+  if (!form) return;
+
+  if (form.dataset.submitting === '1') {
+    e.preventDefault(); // 2回目以降は送らない
+    return;
+  }
+  form.dataset.submitting = '1';
+}, { capture: true });
+
+// 2) ボタンクリックも即ブロック（古いブラウザ/拡張の干渉対策）
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('form.delete-form button[type="submit"]');
+  if (!btn) return;
+
+  const form = btn.closest('form.delete-form');
+  if (!form) return;
+
+  if (form.dataset.submitting === '1') {
+    e.preventDefault(); // 多重クリック抑止
+    return;
+  }
+  // クリックで先にフラグを立てる（submitより先に拾えることがある）
+  form.dataset.submitting = '1';
+}, { capture: true });
+
+// デバッグ確認（読み込まれているか）
+console.info('[delete-guard] installed');
+
+>>>>>>> e94193f (fix(delete): 連打の抑止)
