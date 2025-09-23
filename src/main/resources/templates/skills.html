@@ -238,7 +238,8 @@
                                         <input type="hidden" name="id"    th:value="${s.id}" />
                                         <input type="hidden" name="month" th:value="${selectedMonth}" />
                                         <button type="submit" class="delete-btn"
-                                                th:attr="data-id=${s.id}, data-category=${s.category.name}">
+                                                th:attr="data-id=${s.id}, data-category=${s.category.name}"
+                                                onclick="this.disabled=true; this.dataset.loading='1'; this.form.submit();">
                                         削除する
                                         </button>
                                     </form>
