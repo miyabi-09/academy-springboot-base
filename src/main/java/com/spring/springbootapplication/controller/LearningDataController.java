@@ -10,11 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.lang.ProcessBuilder.Redirect;
 import java.time.YearMonth;
 import java.util.List;
-import org.springframework.web.bind.annotation.RequestBody;
-
 
 @Controller
 public class LearningDataController {
@@ -40,6 +37,13 @@ public class LearningDataController {
         String selectedMonth = (month == null || month.isBlank())
                 ? YearMonth.now().toString()
                 : month;
+
+
+        
+        // ★ 2) skills を必ず取得してモデルへ（nullを渡さない！）
+        Long userId = getLoginUserId(); // 実装があるなら置き換え
+        var skills = learningDataService.listByUserAndYm(userId, selectedMonth);
+        model.addAttribute("skills", skills);
 
         // 2) プルダウンの候補（月, ラベル）
         List<LearningDataService.MonthOption> months = learningDataService.pastThreeMonths();
@@ -79,7 +83,7 @@ public class LearningDataController {
         ra.addFlashAttribute("editedStudyTime", updated.getStudyTime());
 
         String normalized = learningDataService.normalizeYm(month);
-        return"redirect:/skills?month=" + normalized;
+        return "redirect:/skills-legacy?month=" + normalized;
         }
 
         private Long getLoginUserId() {
@@ -90,19 +94,23 @@ public class LearningDataController {
     @PostMapping("/skills/delete")
     public String delete(
         @RequestParam Integer id,
-        @RequestParam String month,
+        @RequestParam(required = false) String month,
         RedirectAttributes ra) {
 
         Long userId = getLoginUserId();
-       // 表示用メッセージに使うなら削除前に取得
-    var target = learningDataService.deleteByIdForUser(userId, id);
+       // サービスは「存在すれば削除して、表示用の名前を返す」「無ければ空」を返す想定
+    var infoOpt = learningDataService.deleteByIdForUser(userId, id);
 
-        ra.addFlashAttribute("deleteSuccess", true);
-        ra.addFlashAttribute("deletedCategory", target.getCategory().getName());
-        ra.addFlashAttribute("deletedName", target.getName());
+    // フラッシュメッセージ（存在しなくても成功扱いにする）
+    ra.addFlashAttribute("deleteSuccess", infoOpt.isPresent());
+    infoOpt.ifPresent(info -> {
+        ra.addFlashAttribute("deletedCategory", info.category());
+        ra.addFlashAttribute("deletedName", info.name());
+    });
 
-        String normalized = learningDataService.normalizeYm(month);
-        return"redirect:/skills?month=" + normalized;
-        }
+    // month が null でも落ちないように
+    String normalized = learningDataService.normalizeYm(month);
+    return  "redirect:/skills-legacy?month=" + normalized;
     
+}
 }

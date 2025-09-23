@@ -180,7 +180,6 @@ function monthJpLabel(isoYm) {
     dlg.querySelector('.modal-btn')?.addEventListener('click', () => {
       dlg.close();
     });
-    // ===== 後始末ここまで =====
   }
 
   if (document.readyState === 'loading') {
@@ -190,4 +189,17 @@ function monthJpLabel(isoYm) {
   }
 })();
 
+// 削除フォームの二重送信だけを防ぐ（UIは変えない）
+document.addEventListener('submit', function (e) {
+  const form = e.target.closest('form.delete-form');
+  if (!form) return;
+
+  // すでに送信中なら2回目以降をキャンセル
+  if (form.dataset.submitting === '1') {
+    e.preventDefault();
+    return;
+  }
+  // 送信開始フラグだけ立てる（UI変更なし）
+  form.dataset.submitting = '1';
+}, { capture: true });
 
