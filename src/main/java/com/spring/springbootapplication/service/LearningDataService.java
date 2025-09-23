@@ -6,21 +6,19 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-
 import java.util.Optional;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import org.springframework.dao.EmptyResultDataAccessException;
-
+import com.spring.springbootapplication.dto.CategoryTotalDTO;
 import com.spring.springbootapplication.dto.SkillsDTO;
 import com.spring.springbootapplication.entity.Category;
 import com.spring.springbootapplication.entity.LearningData;
 import com.spring.springbootapplication.entity.User;
 import com.spring.springbootapplication.repository.CategoryRepository;
 import com.spring.springbootapplication.repository.LearningDataRepository;
-import com.spring.springbootapplication.dto.CategoryTotalDTO;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -143,17 +141,18 @@ public class LearningDataService {
     }
 
     // 学習時間を更新
-public LearningData updateMinutes(Long userId, Integer id, int minutes) {
-    int safe = Math.max(0, Math.min(minutes, 1440)); // 0〜1440に丸める
-    LearningData ld = repo.findByIdAndUser_Id(id.longValue(), userId)
-        .orElseThrow(() -> new IllegalArgumentException("データが見つかりません (id=" + id + ")"));
-    ld.setStudyTime(safe);
-    return repo.save(ld);
-}
+    public LearningData updateMinutes(Long userId, Integer id, int minutes) {
+        int safe = Math.max(0, Math.min(minutes, 1440)); // 0〜1440に丸める
+        LearningData ld = repo.findByIdAndUser_Id(id.longValue(), userId)
+                .orElseThrow(() -> new IllegalArgumentException("データが見つかりません (id=" + id + ")"));
+        ld.setStudyTime(safe);
+        return repo.save(ld);
+    }
 
-    // 学習時間を削除
-public static record DeletedInfo(String name, String category) {}
-public Optional<DeletedInfo> deleteByIdForUser(Long userId, Integer id) {
+    // ===== 学習時間を削除（冪等 & 表示用情報を返す）=====
+    public static record DeletedInfo(String name, String category) {}
+
+    public Optional<DeletedInfo> deleteByIdForUser(Long userId, Integer id) {
         var opt = repo.findByIdAndUser_Id(id.longValue(), userId);
         if (opt.isEmpty()) {
             // 既に削除済みなど：ここで例外にせず空で返す（= 冪等）
@@ -162,19 +161,6 @@ public Optional<DeletedInfo> deleteByIdForUser(Long userId, Integer id) {
 
         LearningData ld = opt.get();
 
-<<<<<<< HEAD
-    return ld; 
-}
-
-// LearningDataService.java
-@Transactional(readOnly = true)
-public List<CategoryTotalDTO> getCategoryTotalsByStrMonth(Long userId, String ym){
-    LocalDate monthStart = toStudyMonth(ym);      // yyyy-MM-01
-    LocalDate monthEnd   = monthStart.plusMonths(1);
-    return repo.findCategoryTotalsByUserAndMonthRange(userId, monthStart, monthEnd);
-}
-
-=======
         // 削除前に表示用値を確保（削除後に関連へ触ると遅延ロード例外等の恐れ）
         String name = ld.getName();
         String categoryName = (ld.getCategory() != null && ld.getCategory().getName() != null)
@@ -190,5 +176,12 @@ public List<CategoryTotalDTO> getCategoryTotalsByStrMonth(Long userId, String ym
 
         return Optional.of(new DeletedInfo(name, categoryName));
     }
->>>>>>> 7ffd22b (fix(delete): 削除ボタンの連打防止)
+
+    // ===== チャート用：カテゴリ合計を月で取得 =====
+    @Transactional(readOnly = true)
+    public List<CategoryTotalDTO> getCategoryTotalsByStrMonth(Long userId, String ym) {
+        LocalDate monthStart = toStudyMonth(ym);      // yyyy-MM-01
+        LocalDate monthEnd   = monthStart.plusMonths(1);
+        return repo.findCategoryTotalsByUserAndMonthRange(userId, monthStart, monthEnd);
+    }
 }
