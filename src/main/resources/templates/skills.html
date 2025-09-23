@@ -233,7 +233,7 @@
                                     </form>
 
                                     <!-- 削除 -->
-                                    <form th:action="@{/skills/delete}" method="post" style="display:inline;">
+                                    <form class="delete-form" th:action="@{/skills/delete}" method="post" style="display:inline;">
                                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                                         <input type="hidden" name="id"    th:value="${s.id}" />
                                         <input type="hidden" name="month" th:value="${selectedMonth}" />
