@@ -16,6 +16,7 @@ function initMonthDropdown() {
   const input = document.getElementById('monthInput');
   if (!form || !btn || !menu || !label || !input) return;
 
+  // （保険）サーバが li を出せなかったときは当月+過去2ヶ月を自前で生成
   if (menu.children.length === 0) {
     const selected = input.value || ym(0);
     [0, 1, 2].forEach(i => {
@@ -33,6 +34,7 @@ function initMonthDropdown() {
     label.textContent = monthJpLabel(selected);
   }
 
+  // 開閉
   btn.addEventListener('click', (e) => {
     e.preventDefault();
     const open = btn.getAttribute('aria-expanded') === 'true';
@@ -40,12 +42,13 @@ function initMonthDropdown() {
     menu.hidden = open;
   });
 
+  // 選択 → hidden へ反映 → 送信
   menu.addEventListener('click', (e) => {
     const li = e.target.closest('li[role="option"]');
     if (!li) return;
 
-    const value = li.getAttribute('data-value');
-    const text  = li.textContent.trim();
+    const value = li.getAttribute('data-value');  // "yyyy-MM"
+    const text  = li.textContent.trim();         // "M月"
 
     input.value = value;
     label.textContent = text;
@@ -60,9 +63,10 @@ function initMonthDropdown() {
     menu.hidden = true;
     btn.setAttribute('aria-expanded', 'false');
 
-    form.submit(); // /skills?month=yyyy-MM
+    form.submit(); // ★ /skills-legacy?month=yyyy-MM に送信（HTML側で変更済み）
   });
 
+  // 外側クリック/ESCで閉じる
   document.addEventListener('click', (e) => {
     if (menu.hidden) return;
     if (e.target === btn || btn.contains(e.target) || menu.contains(e.target)) return;
@@ -77,7 +81,7 @@ function initMonthDropdown() {
   });
 }
 
-// ▲▼ステッパー（1分刻み・0〜1440の範囲）
+// ▲▼ステッパー
 function initStepper() {
   document.addEventListener('click', (e) => {
     const stepBtn = e.target.closest('.number-stepper .step');
@@ -96,70 +100,26 @@ function initStepper() {
     if (v > max) v = max;
 
     input.value = String(v);
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-
+    input.dispatchEvent(new Event('change', { bubbles: true }));
   });
-
-  // 入力確定時（change/blur）のみ 0〜1440 に正規化
-function normalizeMinutesInput(el) {
-  let s = el.value.trim();
-  if (s === '') {                 // 空のまま確定したら 0
-    el.value = '0';
-    return;
-  }
-  let n = Number(s);
-  if (!Number.isFinite(n)) n = 0;
-  n = Math.round(Math.max(0, Math.min(n, 1440)));
-  el.value = String(n);
 }
 
-document.addEventListener('change', (e) => {
-  const el = e.target;
-  if (el instanceof HTMLInputElement && el.classList.contains('minutes-input')) {
-    normalizeMinutesInput(el);
-  }
-});
-
-document.addEventListener('blur', (e) => {
-  const el = e.target;
-  if (el instanceof HTMLInputElement && el.classList.contains('minutes-input')) {
-    normalizeMinutesInput(el);
-  }
-}, true); // キャプチャで blur を拾う
-
-
-// 保存フォーム連携（hidden minutes に詰めてから送信）
+// 保存フォーム連携
 function initSaveFormsGlue() {
   document.addEventListener('submit', (e) => {
     const form = e.target;
     if (!(form instanceof HTMLFormElement)) return;
 
-    // 「保存フォーム」のみ対象：hidden minutes を持っているかで判定
+    // 保存フォームの見分け方：hidden minutes を持っている
     const hidden = form.querySelector('input[type="hidden"][name="minutes"]');
     if (!hidden) return;
 
-    // まず同じ行から minutes-input を探す
-    let minutesInput = form.closest('tr')?.querySelector('.minutes-input');
-
-    // 行が掴めないケースの保険：id一致で探す
-    if (!minutesInput) {
-      const idField = form.querySelector('input[name="id"]');
-      const idVal = idField && idField.value ? idField.value : null;
-      if (idVal) {
-        minutesInput = document.querySelector(`.minutes-input[data-id="${CSS.escape(idVal)}"]`);
-      }
-    }
-
-    // それでも見つからなければ 0 扱い（送信は継続）
-    let n = 0;
+    // 同じ行の分数を取得
+    const row = form.closest('tr');
+    const minutesInput = row?.querySelector('.minutes-input');
     if (minutesInput) {
-      const v = Number(minutesInput.value);
-      n = Number.isFinite(v) ? v : 0;
+      hidden.value = minutesInput.value || '0';
     }
-
-    // 1分単位で 0〜1440 に丸めて hidden へ
-    n = Math.round(Math.max(0, Math.min(n, 1440)));
-    hidden.value = String(n);
   });
 }
 
@@ -177,34 +137,58 @@ function monthJpLabel(isoYm) {
   return m ? `${m}月` : '';
 }
 
-// --- 編集完了モーダルを表示（残像対策付き） ---
-(function () {
-  function showEditDoneModal() {
-    const dlg = document.getElementById('deletedModal')
-            || document.getElementById('addedModal')
-            || document.getElementById('editDoneModal');
-    if (!dlg) return;
+// --- 削除フォーム 連打防止（決定版） ---
+(function installDeleteGuard() {
+  if (window.__deleteGuardInstalled) return;
+  window.__deleteGuardInstalled = true;
 
-    if (typeof dlg.showModal === 'function') {
-      if (!dlg.open) dlg.showModal();
-    } else {
-      dlg.setAttribute('open', '');
+  // 1) submit は一度きり（ここで初回にフラグを立て、ボタン無効化）
+  document.addEventListener('submit', (e) => {
+    const form = e.target.closest('form.delete-form');
+    if (!form) return;
+
+    if (form.dataset.submitting === '1') {
+      e.preventDefault(); // 2回目以降をブロック
+      return;
     }
+    form.dataset.submitting = '1'; // ★ 初回はここで立てる
 
-    const forceRepaint = () => { void document.body.offsetHeight; };
-    dlg.addEventListener('close', () => {
-      requestAnimationFrame(() => { forceRepaint(); dlg.remove(); });
-    });
-    dlg.addEventListener('cancel', () => {
-      requestAnimationFrame(() => { forceRepaint(); dlg.remove(); });
-    });
-    dlg.querySelector('.modal-btn')?.addEventListener('click', () => dlg.close());
-  }
+    const btn = form.querySelector('button[type="submit"]');
+    if (btn) btn.disabled = true;  // 見た目もロック
+  }, { capture: true });
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', showEditDoneModal);
-  } else {
-    showEditDoneModal();
-  }
+  // 2) クリック経路は「既に送信中なら止める」だけ（★ここでフラグは立てない）
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('form.delete-form button[type="submit"]');
+    if (!btn) return;
+    const form = btn.closest('form.delete-form');
+    if (form.dataset.submitting === '1') {
+      e.preventDefault(); // 2回目以降のクリックを無視
+    }
+    // フラグは submit 側で立てる
+  }, { capture: true });
+
+  console.info('[delete-guard] installed');
 })();
-}
+
+// --- フラッシュ用モーダルを自動表示（deletedModal / addedModal どちらでも） ---
+(function openFlashDialogOnce() {
+  const dlg = document.getElementById('deletedModal') || document.getElementById('addedModal');
+  if (!dlg) return; // フラッシュ無ければ何もしない（th:if で未描画）
+
+  try {
+    if (typeof dlg.showModal === 'function') {
+      if (!dlg.open) dlg.showModal(); // HTMLDialogElement
+    } else {
+      dlg.setAttribute('open', '');   // 古いブラウザ向けフォールバック
+    }
+  } catch (e) {
+    console.warn('[flash-dialog]', e);
+    dlg.setAttribute('open', '');     // 念のため
+  }
+
+  // 閉じたらDOMから取り除いて残像防止（任意）
+  const cleanup = () => dlg.remove();
+  dlg.addEventListener('close', cleanup, { once: true });
+  dlg.addEventListener('cancel', cleanup, { once: true });
+})();

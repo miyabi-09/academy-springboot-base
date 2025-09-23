@@ -45,7 +45,7 @@ public interface LearningDataRepository extends JpaRepository<LearningData, Inte
     );
 
     // 更新用
-    Optional<LearningData> findByIdAndUser_Id(Integer id, Long userId);
+    Optional<LearningData> findByIdAndUser_Id(Long id, Long userId);
 
     // 削除用（EntityのIDがIntegerなので合わせる）
     void deleteByIdAndUser_Id(Integer id, Long userId);

@@ -9,6 +9,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+<<<<<<< HEAD
+=======
+import java.time.YearMonth;
+>>>>>>> 7ffd22b (fix(delete): 削除ボタンの連打防止)
 import java.util.List;
 
 @Controller
@@ -43,6 +47,17 @@ public class LearningDataController {
         var skills = learningDataService.listByUserAndYm(userId, selectedMonth);
         model.addAttribute("skills", skills);
 
+<<<<<<< HEAD
+=======
+
+        
+        // ★ 2) skills を必ず取得してモデルへ（nullを渡さない！）
+        Long userId = getLoginUserId(); // 実装があるなら置き換え
+        var skills = learningDataService.listByUserAndYm(userId, selectedMonth);
+        model.addAttribute("skills", skills);
+
+        // 2) プルダウンの候補（月, ラベル）
+>>>>>>> 7ffd22b (fix(delete): 削除ボタンの連打防止)
         List<LearningDataService.MonthOption> months = learningDataService.pastThreeMonths();
         model.addAttribute("months", months);
         model.addAttribute("selectedMonth", selectedMonth);
@@ -66,13 +81,26 @@ public class LearningDataController {
         ra.addFlashAttribute("editSuccess", true);
         ra.addFlashAttribute("editedCategory", updated.getCategory().getName());
         ra.addFlashAttribute("editedName", updated.getName());
+<<<<<<< HEAD
         ra.addFlashAttribute("editedMinutes", safe); 
         return "redirect:/skills-legacy?month=" + learningDataService.normalizeYm(month);
+=======
+        ra.addFlashAttribute("editedStudyTime", updated.getStudyTime());
+
+        String normalized = learningDataService.normalizeYm(month);
+        return "redirect:/skills-legacy?month=" + normalized;
+        }
+
+        private Long getLoginUserId() {
+        // 認証導入前のダミー実装
+        return 1L;
+>>>>>>> 7ffd22b (fix(delete): 削除ボタンの連打防止)
     }
 
     // 学習時間の削除
     @PostMapping("/skills/delete")
     public String delete(
+<<<<<<< HEAD
             @AuthenticationPrincipal(expression = "username") String email,
             @RequestParam Integer id,
             @RequestParam String month,
@@ -121,4 +149,26 @@ public class LearningDataController {
 
         return "redirect:/skills-legacy?month=" + learningDataService.normalizeYm(form.getMonth());
     }
+=======
+        @RequestParam Integer id,
+        @RequestParam(required = false) String month,
+        RedirectAttributes ra) {
+
+        Long userId = getLoginUserId();
+       // サービスは「存在すれば削除して、表示用の名前を返す」「無ければ空」を返す想定
+    var infoOpt = learningDataService.deleteByIdForUser(userId, id);
+
+    // フラッシュメッセージ（存在しなくても成功扱いにする）
+    ra.addFlashAttribute("deleteSuccess", infoOpt.isPresent());
+    infoOpt.ifPresent(info -> {
+        ra.addFlashAttribute("deletedCategory", info.category());
+        ra.addFlashAttribute("deletedName", info.name());
+    });
+
+    // month が null でも落ちないように
+    String normalized = learningDataService.normalizeYm(month);
+    return  "redirect:/skills-legacy?month=" + normalized;
+    
+>>>>>>> 7ffd22b (fix(delete): 削除ボタンの連打防止)
+}
 }
