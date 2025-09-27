@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initSaveFormsGlue();
 });
 
-
 // 月プルダウン（ボタン＋ul）
 function initMonthDropdown() {
   const form  = document.getElementById('monthForm');
@@ -64,7 +63,7 @@ function initMonthDropdown() {
     menu.hidden = true;
     btn.setAttribute('aria-expanded', 'false');
 
-    form.submit(); // /skills?month=yyyy-MM
+    form.submit(); // ★ /skills-legacy?month=yyyy-MM に送信（HTML側で変更済み）
   });
 
   // 外側クリック/ESCで閉じる
@@ -82,8 +81,7 @@ function initMonthDropdown() {
   });
 }
 
-
-   // ▲▼ステッパー
+// ▲▼ステッパー
 function initStepper() {
   document.addEventListener('click', (e) => {
     const stepBtn = e.target.closest('.number-stepper .step');
@@ -106,8 +104,7 @@ function initStepper() {
   });
 }
 
-
-  // 保存フォーム連携
+// 保存フォーム連携
 function initSaveFormsGlue() {
   document.addEventListener('submit', (e) => {
     const form = e.target;
@@ -140,54 +137,58 @@ function monthJpLabel(isoYm) {
   return m ? `${m}月` : '';
 }
 
-// --- 編集完了モーダルを表示 ---
-(function () {
-  function showEditDoneModal() {
-    const dlg = document.getElementById('deletedModal')
-            || document.getElementById('addedModal')
-            || document.getElementById('editDoneModal');
-    if (!dlg) return;
+// --- 削除フォーム 連打防止（決定版） ---
+(function installDeleteGuard() {
+  if (window.__deleteGuardInstalled) return;
+  window.__deleteGuardInstalled = true;
 
-    // 開く
-    if (typeof dlg.showModal === 'function') {
-      if (!dlg.open) dlg.showModal();
-    } else {
-      dlg.setAttribute('open', '');
+  // 1) submit は一度きり（ここで初回にフラグを立て、ボタン無効化）
+  document.addEventListener('submit', (e) => {
+    const form = e.target.closest('form.delete-form');
+    if (!form) return;
+
+    if (form.dataset.submitting === '1') {
+      e.preventDefault(); // 2回目以降をブロック
+      return;
     }
+    form.dataset.submitting = '1'; // ★ 初回はここで立てる
 
-    // ===== ここから後始末（残像対策） =====
-    const forceRepaint = () => {
-      void document.body.offsetHeight;
-    };
+    const btn = form.querySelector('button[type="submit"]');
+    if (btn) btn.disabled = true;  // 見た目もロック
+  }, { capture: true });
 
-    // 「閉じた」後に強制再描画 → ついでにDOMから取り除くと最も確実
-    dlg.addEventListener('close', () => {
-      requestAnimationFrame(() => {
-        forceRepaint();
-        dlg.remove();  
-      });
-    });
+  // 2) クリック経路は「既に送信中なら止める」だけ（★ここでフラグは立てない）
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('form.delete-form button[type="submit"]');
+    if (!btn) return;
+    const form = btn.closest('form.delete-form');
+    if (form.dataset.submitting === '1') {
+      e.preventDefault(); // 2回目以降のクリックを無視
+    }
+    // フラグは submit 側で立てる
+  }, { capture: true });
 
-    // Escで閉じた/cancelされた時も同様に掃除
-    dlg.addEventListener('cancel', () => {
-      requestAnimationFrame(() => {
-        forceRepaint();
-        dlg.remove();
-      });
-    });
-
-    // フォームボタン(method="dialog")で閉じる場合の保険
-    dlg.querySelector('.modal-btn')?.addEventListener('click', () => {
-      dlg.close();
-    });
-    // ===== 後始末ここまで =====
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', showEditDoneModal);
-  } else {
-    showEditDoneModal();
-  }
+  console.info('[delete-guard] installed');
 })();
 
+// --- フラッシュ用モーダルを自動表示（deletedModal / addedModal どちらでも） ---
+(function openFlashDialogOnce() {
+  const dlg = document.getElementById('deletedModal') || document.getElementById('addedModal');
+  if (!dlg) return; // フラッシュ無ければ何もしない（th:if で未描画）
 
+  try {
+    if (typeof dlg.showModal === 'function') {
+      if (!dlg.open) dlg.showModal(); // HTMLDialogElement
+    } else {
+      dlg.setAttribute('open', '');   // 古いブラウザ向けフォールバック
+    }
+  } catch (e) {
+    console.warn('[flash-dialog]', e);
+    dlg.setAttribute('open', '');     // 念のため
+  }
+
+  // 閉じたらDOMから取り除いて残像防止（任意）
+  const cleanup = () => dlg.remove();
+  dlg.addEventListener('close', cleanup, { once: true });
+  dlg.addEventListener('cancel', cleanup, { once: true });
+})();

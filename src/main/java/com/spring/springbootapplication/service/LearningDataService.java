@@ -6,10 +6,13 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.stream.IntStream;
+
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import com.spring.springbootapplication.dto.SkillsDTO;
 import com.spring.springbootapplication.entity.Category;
@@ -47,7 +50,7 @@ public class LearningDataService {
     @Transactional(readOnly = true)
     public List<MonthOption> pastThreeMonths() {
         YearMonth base = YearMonth.now(ZONE_TOKYO);
-        return IntStream.range(0, 3)
+        return java.util.stream.IntStream.range(0, 3)
                 .mapToObj(i -> base.minusMonths(i))
                 .map(ym -> new MonthOption(
                         ym.toString(),                      // 例: "2025-09"
@@ -148,14 +151,29 @@ public LearningData updateMinutes(Long userId, Integer id, int minutes) {
 }
 
     // 学習時間を削除
-public LearningData deleteByIdForUser(Long userId, Integer id) {
-    LearningData ld = repo.findByIdAndUser_Id(id, userId)
-        .orElseThrow(() -> new IllegalArgumentException("データが見つかりません (id=" + id + ")"));
-    ld.getCategory().getName();
-    ld.getName();
+public static record DeletedInfo(String name, String category) {}
+public Optional<DeletedInfo> deleteByIdForUser(Long userId, Integer id) {
+        var opt = repo.findByIdAndUser_Id(id, userId);
+        if (opt.isEmpty()) {
+            // 既に削除済みなど：ここで例外にせず空で返す（= 冪等）
+            return Optional.empty();
+        }
 
-    repo.delete(ld);
+        LearningData ld = opt.get();
 
-    return ld; 
-}
+        // 削除前に表示用値を確保（削除後に関連へ触ると遅延ロード例外等の恐れ）
+        String name = ld.getName();
+        String categoryName = (ld.getCategory() != null && ld.getCategory().getName() != null)
+                ? ld.getCategory().getName()
+                : "";
+
+        try {
+            // 実際の削除。delete(ld) / deleteById のどちらでもOK
+            repo.delete(ld);
+        } catch (EmptyResultDataAccessException ex) {
+            // 並行で既に他リクエストが削除した等のレース：成功扱いで握る
+        }
+
+        return Optional.of(new DeletedInfo(name, categoryName));
+    }
 }
