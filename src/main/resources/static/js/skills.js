@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initSaveFormsGlue();
 });
 
-
 // 月プルダウン（ボタン＋ul）
 function initMonthDropdown() {
   const form  = document.getElementById('monthForm');
@@ -64,7 +63,7 @@ function initMonthDropdown() {
     menu.hidden = true;
     btn.setAttribute('aria-expanded', 'false');
 
-    form.submit(); // /skills?month=yyyy-MM
+    form.submit(); // ★ /skills-legacy?month=yyyy-MM に送信（HTML側で変更済み）
   });
 
   // 外側クリック/ESCで閉じる
@@ -82,8 +81,7 @@ function initMonthDropdown() {
   });
 }
 
-
-   // ▲▼ステッパー
+// ▲▼ステッパー
 function initStepper() {
   document.addEventListener('click', (e) => {
     const stepBtn = e.target.closest('.number-stepper .step');
@@ -106,8 +104,7 @@ function initStepper() {
   });
 }
 
-
-  // 保存フォーム連携
+// 保存フォーム連携
 function initSaveFormsGlue() {
   document.addEventListener('submit', (e) => {
     const form = e.target;
@@ -140,97 +137,40 @@ function monthJpLabel(isoYm) {
   return m ? `${m}月` : '';
 }
 
-// --- 編集完了モーダルを表示 ---
-(function () {
-  function showEditDoneModal() {
-    const dlg = document.getElementById('deletedModal')
-            || document.getElementById('addedModal')
-            || document.getElementById('editDoneModal');
-    if (!dlg) return;
+// --- 削除フォーム 連打防止（決定版） ---
+// 二重インストール防止＋submit/clickの二系統でブロック＋送信時に無効化
+(function installDeleteGuard() {
+  if (window.__deleteGuardInstalled) return;
+  window.__deleteGuardInstalled = true;
 
-    // 開く
-    if (typeof dlg.showModal === 'function') {
-      if (!dlg.open) dlg.showModal();
-    } else {
-      dlg.setAttribute('open', '');
+  // submit は一度きり（クリック/Enter/自動再送すべてに効く）
+  document.addEventListener('submit', (e) => {
+    const form = e.target.closest('form.delete-form');
+    if (!form) return;
+
+    if (form.dataset.submitting === '1') {
+      e.preventDefault(); // 2回目以降は送らない
+      return;
     }
+    form.dataset.submitting = '1';
 
-    // ===== ここから後始末（残像対策） =====
-    const forceRepaint = () => {
-      void document.body.offsetHeight;
-    };
+    // 送信と同時にボタンを無効化（任意で文言変更も可）
+    const btn = form.querySelector('button[type="submit"]');
+    if (btn) btn.disabled = true;
+  }, { capture: true });
 
-    // 「閉じた」後に強制再描画 → ついでにDOMから取り除くと最も確実
-    dlg.addEventListener('close', () => {
-      requestAnimationFrame(() => {
-        forceRepaint();
-        dlg.remove();  
-      });
-    });
+  // クリック経路でも先にブロック（古い環境や拡張の干渉対策）
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('form.delete-form button[type="submit"]');
+    if (!btn) return;
+    const form = btn.closest('form.delete-form');
+    if (form.dataset.submitting === '1') {
+      e.preventDefault();
+      return;
+    }
+    form.dataset.submitting = '1';
+    btn.disabled = true;
+  }, { capture: true });
 
-    // Escで閉じた/cancelされた時も同様に掃除
-    dlg.addEventListener('cancel', () => {
-      requestAnimationFrame(() => {
-        forceRepaint();
-        dlg.remove();
-      });
-    });
-
-    // フォームボタン(method="dialog")で閉じる場合の保険
-    dlg.querySelector('.modal-btn')?.addEventListener('click', () => {
-      dlg.close();
-    });
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', showEditDoneModal);
-  } else {
-    showEditDoneModal();
-  }
+  console.info('[delete-guard] installed');
 })();
-
-// 削除フォームの二重送信だけを防ぐ（UIは変えない）
-document.addEventListener('submit', function (e) {
-  const form = e.target.closest('form.delete-form');
-  if (!form) return;
-
-  // すでに送信中なら2回目以降をキャンセル
-  if (form.dataset.submitting === '1') {
-    e.preventDefault();
-    return;
-  }
-  // 送信開始フラグだけ立てる（UI変更なし）
-  form.dataset.submitting = '1';
-}, { capture: true });
-
-// 1) submit を一度きりに（クリック/Enter/自動再送すべて対応）
-document.addEventListener('submit', (e) => {
-  const form = e.target.closest('form.delete-form');
-  if (!form) return;
-
-  if (form.dataset.submitting === '1') {
-    e.preventDefault(); // 2回目以降は送らない
-    return;
-  }
-  form.dataset.submitting = '1';
-}, { capture: true });
-
-// 2) ボタンクリックも即ブロック（古いブラウザ/拡張の干渉対策）
-document.addEventListener('click', (e) => {
-  const btn = e.target.closest('form.delete-form button[type="submit"]');
-  if (!btn) return;
-
-  const form = btn.closest('form.delete-form');
-  if (!form) return;
-
-  if (form.dataset.submitting === '1') {
-    e.preventDefault(); // 多重クリック抑止
-    return;
-  }
-  // クリックで先にフラグを立てる（submitより先に拾えることがある）
-  form.dataset.submitting = '1';
-}, { capture: true });
-
-// デバッグ確認（読み込まれているか）
-console.info('[delete-guard] installed');
-
