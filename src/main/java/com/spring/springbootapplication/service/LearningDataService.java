@@ -52,8 +52,8 @@ public class LearningDataService {
         return java.util.stream.IntStream.range(0, 3)
                 .mapToObj(i -> base.minusMonths(i))
                 .map(ym -> new MonthOption(
-                        ym.toString(),                      // 例: "2025-09"
-                        MONTH_ONLY_LABEL_FMT.format(ym.atDay(1)) // "M月"
+                        ym.toString(),                              // 例: "2025-09"
+                        MONTH_ONLY_LABEL_FMT.format(ym.atDay(1))    // "M月"
                 ))
                 .toList();
     }
@@ -140,10 +140,10 @@ public class LearningDataService {
         public String getName() { return name; }
     }
 
-    // 学習時間を更新
+    // ===== 学習時間を更新 =====
     public LearningData updateMinutes(Long userId, Integer id, int minutes) {
         int safe = Math.max(0, Math.min(minutes, 1440)); // 0〜1440に丸める
-        LearningData ld = repo.findByIdAndUser_Id(id.longValue(), userId)
+        LearningData ld = repo.findByIdAndUser_Id(id, userId)
                 .orElseThrow(() -> new IllegalArgumentException("データが見つかりません (id=" + id + ")"));
         ld.setStudyTime(safe);
         return repo.save(ld);
@@ -153,7 +153,7 @@ public class LearningDataService {
     public static record DeletedInfo(String name, String category) {}
 
     public Optional<DeletedInfo> deleteByIdForUser(Long userId, Integer id) {
-        var opt = repo.findByIdAndUser_Id(id.longValue(), userId);
+        var opt = repo.findByIdAndUser_Id(id, userId);
         if (opt.isEmpty()) {
             // 既に削除済みなど：ここで例外にせず空で返す（= 冪等）
             return Optional.empty();

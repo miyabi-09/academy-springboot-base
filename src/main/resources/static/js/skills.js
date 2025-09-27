@@ -63,7 +63,7 @@ function initMonthDropdown() {
     menu.hidden = true;
     btn.setAttribute('aria-expanded', 'false');
 
-    form.submit(); // /skills-legacy?month=yyyy-MM（HTML側のactionに依存）
+    form.submit(); // /skills-legacy?month=yyyy-MM（HTMLのactionに依存）
   });
 
   // 外側クリック/ESCで閉じる
@@ -142,7 +142,7 @@ function monthJpLabel(isoYm) {
   if (window.__deleteGuardInstalled) return;
   window.__deleteGuardInstalled = true;
 
-  // 1) submit は一度きり（クリック/Enter/自動再送すべて対応）
+  // 1) submit は一度きり（ここで初回にフラグを立て、ボタン無効化）
   document.addEventListener('submit', (e) => {
     const form = e.target.closest('form.delete-form');
     if (!form) return;
@@ -166,6 +166,7 @@ function monthJpLabel(isoYm) {
     if (form.dataset.submitting === '1') {
       e.preventDefault();
     }
+    // フラグは submit 側で立てる
   }, { capture: true });
 
   console.info('[delete-guard] installed');
