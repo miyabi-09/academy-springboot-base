@@ -41,7 +41,7 @@
                 </li>
                 </ul>
 
-                <form id="monthForm" th:action="@{/skills}" method="get">
+                <form id="monthForm" th:action="@{/skills-legacy}" method="get">
                     <input type="hidden" name="month" id="monthInput" th:value="${selectedMonth}">
                 </form>
         </div> 
@@ -66,8 +66,7 @@
                                 </tr>
                             </thead>
                             <!-- バックエンド -->
-                            <tbody id="tbody-backend"
-                                th:with="list=${skills.?[category.name == 'バックエンド']}">
+                            <tbody id="tbody-backend" th:with="skillsSafe=${skills ?: T(java.util.Collections).emptyList()},list=${skillsSafe.?[category?.name == 'バックエンド']}">
                                 <tr th:each="s : ${list}">
                                     <td th:text="${s.name}"></td>
                                     <td>
@@ -134,8 +133,7 @@
                                 </tr>
                             </thead>
                             <!-- フロントエンド -->
-                            <tbody id="tbody-frontend"
-                                th:with="list=${skills.?[category.name == 'フロントエンド']}">
+                            <tbody id="tbody-frontend" th:with="skillsSafe=${skills ?: T(java.util.Collections).emptyList()},list=${skillsSafe.?[category?.name == 'フロントエンド']}">
                             <tr th:each="s : ${list}">
                                 <td th:text="${s.name}"></td>
                                 <td>
@@ -203,8 +201,7 @@
                                 </tr>
                             </thead>
                             <!-- インフラ -->
-                            <tbody id="tbody-infra"
-                                th:with="list=${skills.?[category.name == 'インフラ']}">
+                            <tbody id="tbody-infra" th:with="skillsSafe=${skills ?: T(java.util.Collections).emptyList()},list=${skillsSafe.?[category?.name == 'インフラ']}">
                             <tr th:each="s : ${list}">
                                 <td th:text="${s.name}"></td>
                                 <td>

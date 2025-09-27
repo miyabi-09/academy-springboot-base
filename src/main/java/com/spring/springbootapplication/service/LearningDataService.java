@@ -144,7 +144,7 @@ public class LearningDataService {
     // 学習時間を更新
 public LearningData updateMinutes(Long userId, Integer id, int minutes) {
     int safe = Math.max(0, Math.min(minutes, 1440)); // 0〜1440に丸める
-    LearningData ld = repo.findByIdAndUser_Id(id.longValue(), userId)
+    LearningData ld = repo.findByIdAndUser_Id(id, userId)
         .orElseThrow(() -> new IllegalArgumentException("データが見つかりません (id=" + id + ")"));
     ld.setStudyTime(safe);
     return repo.save(ld);
@@ -153,7 +153,7 @@ public LearningData updateMinutes(Long userId, Integer id, int minutes) {
     // 学習時間を削除
 public static record DeletedInfo(String name, String category) {}
 public Optional<DeletedInfo> deleteByIdForUser(Long userId, Integer id) {
-        var opt = repo.findByIdAndUser_Id(id.longValue(), userId);
+        var opt = repo.findByIdAndUser_Id(id, userId);
         if (opt.isEmpty()) {
             // 既に削除済みなど：ここで例外にせず空で返す（= 冪等）
             return Optional.empty();

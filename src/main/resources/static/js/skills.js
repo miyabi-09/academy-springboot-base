@@ -138,39 +138,57 @@ function monthJpLabel(isoYm) {
 }
 
 // --- 削除フォーム 連打防止（決定版） ---
-// 二重インストール防止＋submit/clickの二系統でブロック＋送信時に無効化
 (function installDeleteGuard() {
   if (window.__deleteGuardInstalled) return;
   window.__deleteGuardInstalled = true;
 
-  // submit は一度きり（クリック/Enter/自動再送すべてに効く）
+  // 1) submit は一度きり（ここで初回にフラグを立て、ボタン無効化）
   document.addEventListener('submit', (e) => {
     const form = e.target.closest('form.delete-form');
     if (!form) return;
 
     if (form.dataset.submitting === '1') {
-      e.preventDefault(); // 2回目以降は送らない
+      e.preventDefault(); // 2回目以降をブロック
       return;
     }
-    form.dataset.submitting = '1';
+    form.dataset.submitting = '1'; // ★ 初回はここで立てる
 
-    // 送信と同時にボタンを無効化（任意で文言変更も可）
     const btn = form.querySelector('button[type="submit"]');
-    if (btn) btn.disabled = true;
+    if (btn) btn.disabled = true;  // 見た目もロック
   }, { capture: true });
 
-  // クリック経路でも先にブロック（古い環境や拡張の干渉対策）
+  // 2) クリック経路は「既に送信中なら止める」だけ（★ここでフラグは立てない）
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('form.delete-form button[type="submit"]');
     if (!btn) return;
     const form = btn.closest('form.delete-form');
     if (form.dataset.submitting === '1') {
-      e.preventDefault();
-      return;
+      e.preventDefault(); // 2回目以降のクリックを無視
     }
-    form.dataset.submitting = '1';
-    btn.disabled = true;
+    // フラグは submit 側で立てる
   }, { capture: true });
 
   console.info('[delete-guard] installed');
+})();
+
+// --- フラッシュ用モーダルを自動表示（deletedModal / addedModal どちらでも） ---
+(function openFlashDialogOnce() {
+  const dlg = document.getElementById('deletedModal') || document.getElementById('addedModal');
+  if (!dlg) return; // フラッシュ無ければ何もしない（th:if で未描画）
+
+  try {
+    if (typeof dlg.showModal === 'function') {
+      if (!dlg.open) dlg.showModal(); // HTMLDialogElement
+    } else {
+      dlg.setAttribute('open', '');   // 古いブラウザ向けフォールバック
+    }
+  } catch (e) {
+    console.warn('[flash-dialog]', e);
+    dlg.setAttribute('open', '');     // 念のため
+  }
+
+  // 閉じたらDOMから取り除いて残像防止（任意）
+  const cleanup = () => dlg.remove();
+  dlg.addEventListener('close', cleanup, { once: true });
+  dlg.addEventListener('cancel', cleanup, { once: true });
 })();
