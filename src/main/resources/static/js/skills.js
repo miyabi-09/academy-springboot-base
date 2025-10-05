@@ -1,4 +1,4 @@
-/* skills.js — 月プルダウン + 分数ステッパー + 保存フォーム連携（サーバ描画前提） */
+/* skills.js — 月プルダウン + 分数ステッパー + 保存フォーム連携 + 削除連打ガード */
 'use strict';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -63,7 +63,7 @@ function initMonthDropdown() {
     menu.hidden = true;
     btn.setAttribute('aria-expanded', 'false');
 
-    form.submit(); // ★ /skills-legacy?month=yyyy-MM に送信（HTML側で変更済み）
+    form.submit(); // /skills-legacy?month=yyyy-MM（HTMLのactionに依存）
   });
 
   // 外側クリック/ESCで閉じる
@@ -104,7 +104,8 @@ function initStepper() {
   });
 }
 
-// 保存フォーム連携
+// 保存フォーム連携（hidden minutes に入力値を詰める）
+
 function initSaveFormsGlue() {
   document.addEventListener('submit', (e) => {
     const form = e.target;
@@ -146,24 +147,26 @@ function monthJpLabel(isoYm) {
   document.addEventListener('submit', (e) => {
     const form = e.target.closest('form.delete-form');
     if (!form) return;
+    
 
+    // 既に送信中ならブロック
     if (form.dataset.submitting === '1') {
-      e.preventDefault(); // 2回目以降をブロック
+      e.preventDefault();
       return;
     }
-    form.dataset.submitting = '1'; // ★ 初回はここで立てる
-
+    // 初回送信：フラグを立てて見た目もロック
+    form.dataset.submitting = '1';
     const btn = form.querySelector('button[type="submit"]');
-    if (btn) btn.disabled = true;  // 見た目もロック
+    if (btn) btn.disabled = true;
   }, { capture: true });
 
-  // 2) クリック経路は「既に送信中なら止める」だけ（★ここでフラグは立てない）
+  // 2) クリック経路：既に送信中なら止める（ここではフラグは立てない）
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('form.delete-form button[type="submit"]');
     if (!btn) return;
     const form = btn.closest('form.delete-form');
     if (form.dataset.submitting === '1') {
-      e.preventDefault(); // 2回目以降のクリックを無視
+      e.preventDefault();
     }
     // フラグは submit 側で立てる
   }, { capture: true });
@@ -176,6 +179,7 @@ function monthJpLabel(isoYm) {
   const dlg = document.getElementById('deletedModal') || document.getElementById('addedModal');
   if (!dlg) return; // フラッシュ無ければ何もしない（th:if で未描画）
 
+
   try {
     if (typeof dlg.showModal === 'function') {
       if (!dlg.open) dlg.showModal(); // HTMLDialogElement
@@ -186,8 +190,8 @@ function monthJpLabel(isoYm) {
     console.warn('[flash-dialog]', e);
     dlg.setAttribute('open', '');     // 念のため
   }
-
-  // 閉じたらDOMから取り除いて残像防止（任意）
+  
+  // 閉じたらDOMから取り除いて残像防止
   const cleanup = () => dlg.remove();
   dlg.addEventListener('close', cleanup, { once: true });
   dlg.addEventListener('cancel', cleanup, { once: true });

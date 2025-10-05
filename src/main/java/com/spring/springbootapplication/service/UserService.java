@@ -89,7 +89,7 @@
         }
 
             User u = userRepository.findById(userId)
-                    .orElseThrow(IllegalArgumentException::new); // メッセージ不要
+                    .orElseThrow(IllegalArgumentException::new);
 
             u.setAvatarData(file.getBytes()); // bytea へ
             u.setAvatarMime(ct);              // MIME を保持
@@ -108,5 +108,10 @@
                     .map(u -> new AvatarPayload(u.getAvatarData(), u.getAvatarMime()));
         }
 
-
+        @Transactional(readOnly = true)
+        public Long findIdByEmail(String email) {
+        return userRepository.findByEmail(normalizeEmail(email))
+                .map(User::getId)
+                .orElseThrow(() -> new IllegalArgumentException("user not found: " + email));
+}
     }

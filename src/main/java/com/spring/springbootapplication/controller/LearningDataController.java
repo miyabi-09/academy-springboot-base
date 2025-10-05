@@ -1,17 +1,16 @@
 package com.spring.springbootapplication.controller;
 
-import com.spring.springbootapplication.service.LearningDataService;
-import com.spring.springbootapplication.service.UserService;
-import org.springframework.security.core.Authentication;
+import java.util.List;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.YearMonth;
-import java.util.List;
+import com.spring.springbootapplication.dto.SkillsDTO;
+import com.spring.springbootapplication.service.LearningDataService;
+import com.spring.springbootapplication.service.UserService;
 
 @Controller
 public class LearningDataController {
@@ -24,93 +23,112 @@ public class LearningDataController {
         this.userService = userService;
     }
 
+    // （任意）古い /skills を救済
+    @GetMapping("/skills")
+    public String redirectSkills() {
+        return "redirect:/skills-legacy";
+    }
+
+    // 一覧（従来UI）
     @GetMapping("/skills-legacy")
-    public String showSkills(@RequestParam(value = "month", required = false) String month,
-                            Authentication auth,
-                            Model model) {
-        // （必要なら）未ログインを弾く
-        if (auth == null || !auth.isAuthenticated()) {
-            return "redirect:/login";
-        }
+    public String showSkills(
+            @RequestParam(value = "month", required = false) String month,
+            @AuthenticationPrincipal(expression = "username") String email,
+            Model model) {
 
-        // 1) まず selectedMonth を決定（yyyy-MM）
-        String selectedMonth = (month == null || month.isBlank())
-                ? YearMonth.now().toString()
-                : month;
+        if (email == null) return "redirect:/login";
 
+        String selectedMonth = learningDataService.normalizeYm(month);
+        Long userId = userService.findIdByEmail(email);
 
-        
-        // ★ 2) skills を必ず取得してモデルへ（nullを渡さない！）
-        Long userId = getLoginUserId(); // 実装があるなら置き換え
         var skills = learningDataService.listByUserAndYm(userId, selectedMonth);
         model.addAttribute("skills", skills);
 
-        // 2) プルダウンの候補（月, ラベル）
         List<LearningDataService.MonthOption> months = learningDataService.pastThreeMonths();
-
-        // 3) 表示ラベルをここで決める（見つからなければフォールバック）
-        String selectedMonthLabel = months.stream()
-                .filter(m -> m.value().equals(selectedMonth))
-                .map(LearningDataService.MonthOption::label)
-                .findFirst()
-                .orElseGet(() -> months.isEmpty() ? "今月" : months.get(0).label());
-
-        // 4) Viewに渡す
         model.addAttribute("months", months);
         model.addAttribute("selectedMonth", selectedMonth);
-        model.addAttribute("selectedMonthLabel", selectedMonthLabel);
-
-        // 画面の他のモデルは必要に応じて
-        model.addAttribute("backendSkills", List.of());
-        model.addAttribute("frontendSkills", List.of());
-        model.addAttribute("infraSkills", List.of());
+        model.addAttribute("selectedMonthLabel", learningDataService.monthLabel(selectedMonth));
 
         return "skills";
     }
 
+    // 学習時間の保存（更新）
     @PostMapping("/skills/update")
     public String updateMinutes(
-        @RequestParam Integer id,
-        @RequestParam(name = "minutes", defaultValue = "0") int minutes, 
-        @RequestParam String month,
-        RedirectAttributes ra) {
+            @AuthenticationPrincipal(expression = "username") String email,
+            @RequestParam Integer id,
+            @RequestParam String month,
+            @RequestParam(name = "minutes", defaultValue = "0") int minutes,
+            RedirectAttributes ra) {
 
-        Long userId = getLoginUserId();
-        var updated = learningDataService.updateMinutes(userId, id, minutes);
+        Long userId = userService.findIdByEmail(email);
+        int safe = Math.max(0, Math.min(minutes, 1440));
+        var updated = learningDataService.updateMinutes(userId, id, safe);
+
         ra.addFlashAttribute("editSuccess", true);
         ra.addFlashAttribute("editedCategory", updated.getCategory().getName());
         ra.addFlashAttribute("editedName", updated.getName());
-        ra.addFlashAttribute("editedStudyTime", updated.getStudyTime());
+         feature/skills-chart-guard-port
+        ra.addFlashAttribute("editedMinutes", safe); // テンプレ側がどちらでも読めるように
 
-        String normalized = learningDataService.normalizeYm(month);
-        return "redirect:/skills-legacy?month=" + normalized;
-        }
-
-        private Long getLoginUserId() {
-        // 認証導入前のダミー実装
-        return 1L;
+        return "redirect:/skills-legacy?month=" + learningDataService.normalizeYm(month);
     }
 
+    // 学習時間の削除（冪等）
     @PostMapping("/skills/delete")
     public String delete(
-        @RequestParam Integer id,
-        @RequestParam(required = false) String month,
-        RedirectAttributes ra) {
+            @AuthenticationPrincipal(expression = "username") String email,
+            @RequestParam Integer id,
+            @RequestParam(required = false) String month,
+            RedirectAttributes ra) {
 
-        Long userId = getLoginUserId();
-       // サービスは「存在すれば削除して、表示用の名前を返す」「無ければ空」を返す想定
-    var infoOpt = learningDataService.deleteByIdForUser(userId, id);
+        Long userId = userService.findIdByEmail(email);
 
-    // フラッシュメッセージ（存在しなくても成功扱いにする）
-    ra.addFlashAttribute("deleteSuccess", infoOpt.isPresent());
-    infoOpt.ifPresent(info -> {
-        ra.addFlashAttribute("deletedCategory", info.category());
-        ra.addFlashAttribute("deletedName", info.name());
-    });
+        var infoOpt = learningDataService.deleteByIdForUser(userId, id);
 
-    // month が null でも落ちないように
-    String normalized = learningDataService.normalizeYm(month);
-    return  "redirect:/skills-legacy?month=" + normalized;
-    
+        // フラッシュメッセージ（存在しなくても成功扱い）
+        ra.addFlashAttribute("deleteSuccess", infoOpt.isPresent());
+        infoOpt.ifPresent(info -> {
+            ra.addFlashAttribute("deletedCategory", info.category());
+            ra.addFlashAttribute("deletedName", info.name());
+        });
+
+        return "redirect:/skills-legacy?month=" + learningDataService.normalizeYm(month);
+    }
+
+    // 新規フォーム表示
+    @GetMapping("/skills/new")
+    public String newSkill(
+            @RequestParam String categoryName,
+            @RequestParam(required = false) String month,
+            Model model) {
+
+        String normalized = learningDataService.normalizeYm(month);
+        SkillsDTO form = new SkillsDTO();
+        form.setMonth(normalized);
+
+        model.addAttribute("categoryName", categoryName);
+        model.addAttribute("form", form); // skills-new.html の th:object="${form}" と一致
+        return "skills-new";
+    }
+
+    // 新規作成
+    @PostMapping("/skills/create")
+    public String create(
+            @AuthenticationPrincipal(expression = "username") String email,
+            @RequestParam String categoryName,
+            @ModelAttribute("form") SkillsDTO form,
+            RedirectAttributes ra) {
+
+        Long userId = userService.findIdByEmail(email);
+        var saved = learningDataService.saveNewByName(userId, categoryName, form);
+
+        ra.addFlashAttribute("editSuccess", true);
+        ra.addFlashAttribute("editedCategory", categoryName);
+        ra.addFlashAttribute("editedName", saved.getName());
+        ra.addFlashAttribute("editedMinutes", saved.getStudyTime());
+
+        return "redirect:/skills-legacy?month=" + learningDataService.normalizeYm(form.getMonth());
+    }
 }
 }

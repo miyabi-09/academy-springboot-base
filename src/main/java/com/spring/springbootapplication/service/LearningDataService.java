@@ -6,14 +6,13 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-
 import java.util.Optional;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import org.springframework.dao.EmptyResultDataAccessException;
-
+import com.spring.springbootapplication.dto.CategoryTotalDTO;
 import com.spring.springbootapplication.dto.SkillsDTO;
 import com.spring.springbootapplication.entity.Category;
 import com.spring.springbootapplication.entity.LearningData;
@@ -53,8 +52,8 @@ public class LearningDataService {
         return java.util.stream.IntStream.range(0, 3)
                 .mapToObj(i -> base.minusMonths(i))
                 .map(ym -> new MonthOption(
-                        ym.toString(),                      // 例: "2025-09"
-                        MONTH_ONLY_LABEL_FMT.format(ym.atDay(1)) // "M月"
+                        ym.toString(),                              // 例: "2025-09"
+                        MONTH_ONLY_LABEL_FMT.format(ym.atDay(1))    // "M月"
                 ))
                 .toList();
     }
@@ -141,18 +140,19 @@ public class LearningDataService {
         public String getName() { return name; }
     }
 
-    // 学習時間を更新
-public LearningData updateMinutes(Long userId, Integer id, int minutes) {
-    int safe = Math.max(0, Math.min(minutes, 1440)); // 0〜1440に丸める
-    LearningData ld = repo.findByIdAndUser_Id(id, userId)
-        .orElseThrow(() -> new IllegalArgumentException("データが見つかりません (id=" + id + ")"));
-    ld.setStudyTime(safe);
-    return repo.save(ld);
-}
+    // ===== 学習時間を更新 =====
+    public LearningData updateMinutes(Long userId, Integer id, int minutes) {
+        int safe = Math.max(0, Math.min(minutes, 1440)); // 0〜1440に丸める
+        LearningData ld = repo.findByIdAndUser_Id(id, userId)
+                .orElseThrow(() -> new IllegalArgumentException("データが見つかりません (id=" + id + ")"));
+        ld.setStudyTime(safe);
+        return repo.save(ld);
+    }
+  
+    // ===== 学習時間を削除（冪等 & 表示用情報を返す）=====
+    public static record DeletedInfo(String name, String category) {}
 
-    // 学習時間を削除
-public static record DeletedInfo(String name, String category) {}
-public Optional<DeletedInfo> deleteByIdForUser(Long userId, Integer id) {
+    public Optional<DeletedInfo> deleteByIdForUser(Long userId, Integer id) {
         var opt = repo.findByIdAndUser_Id(id, userId);
         if (opt.isEmpty()) {
             // 既に削除済みなど：ここで例外にせず空で返す（= 冪等）
@@ -160,6 +160,7 @@ public Optional<DeletedInfo> deleteByIdForUser(Long userId, Integer id) {
         }
 
         LearningData ld = opt.get();
+
 
         // 削除前に表示用値を確保（削除後に関連へ触ると遅延ロード例外等の恐れ）
         String name = ld.getName();
@@ -176,4 +177,13 @@ public Optional<DeletedInfo> deleteByIdForUser(Long userId, Integer id) {
 
         return Optional.of(new DeletedInfo(name, categoryName));
     }
+
+    // ===== チャート用：カテゴリ合計を月で取得 =====
+    @Transactional(readOnly = true)
+    public List<CategoryTotalDTO> getCategoryTotalsByStrMonth(Long userId, String ym) {
+        LocalDate monthStart = toStudyMonth(ym);      // yyyy-MM-01
+        LocalDate monthEnd   = monthStart.plusMonths(1);
+        return repo.findCategoryTotalsByUserAndMonthRange(userId, monthStart, monthEnd);
+    }
+
 }

@@ -44,7 +44,13 @@
                 <div class="study-section">
                     <div class="study-content">
                         <h1 class="study-title">学習チャート</h1>
-                        <a th:href="@{/skills}" class="submit-edit-btn">編集する</a>
+                        <a th:href="@{/skills-legacy}" class="submit-edit-btn">編集する</a>
+                        <section class="chart-box" style="width:1081px;height:532.5px;">
+                            <canvas id="learningChart" class="learningChart"
+                                    th:attr="data-base-month=${#dates.format(#dates.createNowForTimeZone('Asia/Tokyo'),'yyyy-MM')}"
+                                    width="960" height="360"
+                                    aria-label="スキル学習時間チャート"></canvas>
+                        </section>
                     </div>
                 </div>
             </div>
@@ -55,5 +61,9 @@
                 </div>  
             </footer>
         </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script defer th:src="@{/js/learning-chart.js(v=${T(java.time.LocalDateTime).now().toString()})}"></script>
+
     </body>
 </html>     
