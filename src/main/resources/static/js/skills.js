@@ -105,6 +105,7 @@ function initStepper() {
 }
 
 // 保存フォーム連携（hidden minutes に入力値を詰める）
+
 function initSaveFormsGlue() {
   document.addEventListener('submit', (e) => {
     const form = e.target;
@@ -146,6 +147,7 @@ function monthJpLabel(isoYm) {
   document.addEventListener('submit', (e) => {
     const form = e.target.closest('form.delete-form');
     if (!form) return;
+    
 
     // 既に送信中ならブロック
     if (form.dataset.submitting === '1') {
@@ -177,6 +179,7 @@ function monthJpLabel(isoYm) {
   const dlg = document.getElementById('deletedModal') || document.getElementById('addedModal');
   if (!dlg) return; // フラッシュ無ければ何もしない（th:if で未描画）
 
+
   try {
     if (typeof dlg.showModal === 'function') {
       if (!dlg.open) dlg.showModal(); // HTMLDialogElement
@@ -187,7 +190,7 @@ function monthJpLabel(isoYm) {
     console.warn('[flash-dialog]', e);
     dlg.setAttribute('open', '');     // 念のため
   }
-
+  
   // 閉じたらDOMから取り除いて残像防止
   const cleanup = () => dlg.remove();
   dlg.addEventListener('close', cleanup, { once: true });

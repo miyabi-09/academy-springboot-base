@@ -148,7 +148,7 @@ public class LearningDataService {
         ld.setStudyTime(safe);
         return repo.save(ld);
     }
-
+  
     // ===== 学習時間を削除（冪等 & 表示用情報を返す）=====
     public static record DeletedInfo(String name, String category) {}
 
@@ -160,6 +160,7 @@ public class LearningDataService {
         }
 
         LearningData ld = opt.get();
+
 
         // 削除前に表示用値を確保（削除後に関連へ触ると遅延ロード例外等の恐れ）
         String name = ld.getName();
@@ -184,4 +185,5 @@ public class LearningDataService {
         LocalDate monthEnd   = monthStart.plusMonths(1);
         return repo.findCategoryTotalsByUserAndMonthRange(userId, monthStart, monthEnd);
     }
+
 }

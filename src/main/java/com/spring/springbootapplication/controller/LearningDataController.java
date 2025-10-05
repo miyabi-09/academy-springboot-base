@@ -68,6 +68,7 @@ public class LearningDataController {
         ra.addFlashAttribute("editSuccess", true);
         ra.addFlashAttribute("editedCategory", updated.getCategory().getName());
         ra.addFlashAttribute("editedName", updated.getName());
+         feature/skills-chart-guard-port
         ra.addFlashAttribute("editedMinutes", safe); // テンプレ側がどちらでも読めるように
 
         return "redirect:/skills-legacy?month=" + learningDataService.normalizeYm(month);
@@ -129,4 +130,5 @@ public class LearningDataController {
 
         return "redirect:/skills-legacy?month=" + learningDataService.normalizeYm(form.getMonth());
     }
+}
 }
