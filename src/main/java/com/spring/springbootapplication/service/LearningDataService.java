@@ -148,7 +148,7 @@ public class LearningDataService {
         ld.setStudyTime(safe);
         return repo.save(ld);
     }
-  
+
     // ===== 学習時間を削除（冪等 & 表示用情報を返す）=====
     public static record DeletedInfo(String name, String category) {}
 
