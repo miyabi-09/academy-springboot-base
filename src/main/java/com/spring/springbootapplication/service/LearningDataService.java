@@ -171,7 +171,7 @@ public class LearningDataService {
         try {
             // 実際の削除。delete(ld) / deleteById のどちらでもOK
             repo.delete(ld);
-        } catch (EmptyResultDataAccessException ex) {
+        } catch (EmptyResultDataAccessException ex) {   
             // 並行で既に他リクエストが削除した等のレース：成功扱いで握る
         }
 
