@@ -22,7 +22,7 @@
   <div class="main-content">
 
     <!-- ★ ここを修正：/skills/create & th:object=${form} -->
-    <form th:action="@{/skills/create}" method="post" th:object="${form}" novalidate>
+    <form id="createForm" th:action="@{/skills/create}" method="post" th:object="${form}" novalidate>
       <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
       <input type="hidden" name="categoryName" th:value="${categoryName}">
       <!-- categoryId は使わないので削除 -->
@@ -34,8 +34,9 @@
       <div class="form-container">
         <div class="form-group">
           <label for="name">項目名</label>
-          <input type="text" class="form-control" th:field="*{name}" id="name" placeholder="項目名を入力してください" required />
-          <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+          <input type="text" class="form-control" th:field="*{name}" id="name" placeholder="項目名を入力してください" aria-describedby="nameError"
+                  th:attr="aria-invalid=${#fields.hasErrors('name')}" />
+          <div id="nameError" class="text-danger" aria-live="polite" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
         </div>
 
         <div class="form-group">
@@ -76,6 +77,6 @@
   <div class="footer">portfolio site</div>
 </footer>
 
-<script defer th:src="@{/js/skills.js(v=${T(java.time.LocalDateTime).now().toString()})}"></script>
+<script defer th:src="@{/js/skills-new-validate.js(v=${T(java.time.LocalDateTime).now().toString()})}"></script>
 </body>
 </html>

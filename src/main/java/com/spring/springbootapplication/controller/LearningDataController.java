@@ -5,12 +5,16 @@ import java.util.List;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.spring.springbootapplication.dto.SkillsDTO;
 import com.spring.springbootapplication.service.LearningDataService;
 import com.spring.springbootapplication.service.UserService;
+
+import jakarta.validation.Valid;
+
 
 @Controller
 public class LearningDataController {
@@ -113,20 +117,43 @@ public class LearningDataController {
 
     // 新規作成
     @PostMapping("/skills/create")
-    public String create(
-            @AuthenticationPrincipal(expression = "username") String email,
-            @RequestParam String categoryName,
-            @ModelAttribute("form") SkillsDTO form,
-            RedirectAttributes ra) {
+public String create(
+        @AuthenticationPrincipal(expression = "username") String email,
+        @RequestParam String categoryName,
+        @Valid @ModelAttribute("form") SkillsDTO form,
+        org.springframework.validation.BindingResult br,
+        Model model,
+        RedirectAttributes ra) {
 
+    // 1) 入力バリデーション（必須・桁数など）
+    if (br.hasErrors()) {
+        model.addAttribute("categoryName", categoryName);
+        return "skills-new";  // ← そのまま画面に戻す
+    }
+
+    // 2) 登録（重複時はここでサービスが例外を投げる想定）
+    try {
         Long userId = userService.findIdByEmail(email);
         var saved = learningDataService.saveNewByName(userId, categoryName, form);
 
+        // 成功時フラッシュ
         ra.addFlashAttribute("editSuccess", true);
         ra.addFlashAttribute("editedCategory", categoryName);
         ra.addFlashAttribute("editedName", saved.getName());
         ra.addFlashAttribute("editedMinutes", saved.getStudyTime());
 
         return "redirect:/skills-legacy?month=" + learningDataService.normalizeYm(form.getMonth());
+
+    } catch (LearningDataService.DuplicateLearningDataException ex) {
+        // 3) 重複時：name フィールドにエラーメッセージを付与して再表示
+        String entered = form.getName();
+        br.rejectValue(
+            "name",
+            "duplicate",
+            String.format("%s は既に登録されています", entered)
+        );
+        model.addAttribute("categoryName", categoryName);
+        return "skills-new";
     }
+}
 }
