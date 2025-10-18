@@ -65,6 +65,13 @@ public class LearningDataService {
         return repo.findByUser_IdAndStudyMonthOrderByIdDesc(userId, monthStart);
     }
 
+    /* 分数の共通丸め（0〜1440）*/
+    private int clampMinutes(Integer m) {
+        int v = (m == null) ? 0 : m.intValue();
+        return Math.max(0, Math.min(v, 1440));
+    }
+
+
     /** コントローラから呼ぶ：カテゴリ「名」で保存する版 */
     public LearningData saveNewByName(Long userId, String categoryName, SkillsDTO form) {
         // "yyyy-MM" → 月初 LocalDate（不正なら今月にフォールバック）
@@ -86,7 +93,7 @@ public class LearningDataService {
         ld.setUser(em.getReference(User.class, userId));
         ld.setCategory(em.getReference(Category.class, categoryId));
         ld.setName(trimmed);
-        ld.setStudyTime(form.getStudyTime());
+        ld.setStudyTime(clampMinutes(form.getStudyTime())); 
         ld.setStudyMonth(studyMonth);
 
         return repo.save(ld);

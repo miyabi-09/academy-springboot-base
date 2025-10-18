@@ -4,6 +4,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   initMonthDropdown();
   initStepper();
+  initMinutesGuards(); 
   initSaveFormsGlue();
 });
 
@@ -104,6 +105,87 @@ function initStepper() {
   });
 }
 
+// ---- minutes入力のクランプ＆ガード ----
+function clampInt(v, min = 0, max = 1440) {
+  v = parseInt(v ?? '0', 10);
+  if (!Number.isFinite(v)) v = 0;
+  if (v < min) v = min;
+  if (v > max) v = max;
+  return v;
+}
+
+// ---- minutes入力のガード（ネイティブ検証を生かす）----
+function initMinutesGuards() {
+  // 入力時にだけ妥当性メッセージを付け外し
+  document.addEventListener('input', (e) => {
+    const inp = e.target.closest('.minutes-input');
+    if (!inp) return;
+
+    const v = inp.value === '' ? null : Number(inp.value);
+    // 空は required に任せる。数字で 0〜1440 だけ OK
+    if (v === null) {
+      inp.setCustomValidity(''); // required が面倒を見る
+    } else if (Number.isNaN(v) || v < 0 || v > 1440) {
+      inp.setCustomValidity('0〜1440の数字で入力してください');
+    } else {
+      inp.setCustomValidity('');
+    }
+  });
+
+  // ホイールで勝手に値が動くのを防ぐ（任意）
+  document.addEventListener('wheel', (e) => {
+    const inp = e.target.closest('.minutes-input');
+    if (!inp || document.activeElement !== inp) return;
+    e.preventDefault();
+  }, { passive: false });
+}
+
+// 置き場所：skills.js の initSaveFormsGlue の上あたりに追記
+function validateMinutesInput(inp) {
+  const msgEl = inp.closest('td')?.querySelector('.field-error');
+  const raw = inp.value;
+  let msg = '';
+
+  if (raw === '' || raw == null) {
+    msg = '学習時間は必須です';
+  } else if (!/^-?\d+$/.test(raw)) {
+    msg = '半角の整数で入力してください';
+  } else {
+    const v = Number(raw);
+    if (v < 0) msg = '0以上の数字で入力してください';
+    else if (v > 1440) msg = '1440以下で入力してください';
+  }
+
+  if (msgEl) msgEl.textContent = msg;
+  inp.classList.toggle('is-invalid', !!msg);
+  return msg === '';
+}
+
+// 入力中はエラーの消し/出しだけ行う（値は勝手に直さない）
+function initMinutesGuards() {
+  document.addEventListener('input', (e) => {
+    const inp = e.target.closest('.minutes-input');
+    if (!inp) return;
+    validateMinutesInput(inp);
+  });
+
+  // 任意：フォーカスが外れた時にも再検証
+  document.addEventListener('blur', (e) => {
+    const inp = e.target.closest('.minutes-input');
+    if (!inp) return;
+    validateMinutesInput(inp);
+  }, true);
+
+  // 任意：ホイールでの意図しない変化を防ぐ
+  document.addEventListener('wheel', (e) => {
+    const inp = e.target.closest('.minutes-input');
+    if (!inp || document.activeElement !== inp) return;
+    e.preventDefault();
+  }, { passive: false });
+}
+
+
+
 // 保存フォーム連携（hidden minutes に入力値を詰める）
 
 function initSaveFormsGlue() {
@@ -115,12 +197,20 @@ function initSaveFormsGlue() {
     const hidden = form.querySelector('input[type="hidden"][name="minutes"]');
     if (!hidden) return;
 
-    // 同じ行の分数を取得
+    // 同じ行の minutes を取得
     const row = form.closest('tr');
     const minutesInput = row?.querySelector('.minutes-input');
-    if (minutesInput) {
-      hidden.value = minutesInput.value || '0';
+    if (!minutesInput) return;
+
+    // ★ ここがポイント：ネイティブ検証を発火
+    if (!minutesInput.reportValidity()) {
+      e.preventDefault();      // 送信を止める
+      minutesInput.focus();    // フォーカスを戻す
+      return;
     }
+
+    // 妥当ならそのまま値を詰めて送信
+    hidden.value = minutesInput.value || '0';
   });
 }
 
